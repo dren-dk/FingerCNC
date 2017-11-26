@@ -18,6 +18,7 @@
 
 #include "mstdio.h"
 
+#include "lcd.h"
 
 void led(char on) {
   if (on) {
@@ -46,13 +47,6 @@ void step(char motor) {
   }
 }
 
-void rinse() {
-    PORTF |= _BV(PF0);
-    PORTF |= _BV(PF6);
-    PORTF &= ~_BV(PF0);    
-    PORTF &= ~_BV(PF6);    
-}
-
 void initBoard() {
   wdt_enable(WDTO_4S);
   DDRB  |= _BV(PB7);  // LED output
@@ -61,6 +55,7 @@ void initBoard() {
   //  initADC();
   muartInit();
   motorInit();
+  lcdInit();
 
   mprintf(PSTR("Power up\n"));
 }
@@ -92,11 +87,14 @@ int main(void) {
   int len = 0;
   
   while (1) {
+    mputs("Hello\r\n");
+      
     //led(frame++ & 128);
     loopSleep();
     wdt_reset();
 
     if (--len < 0) {
+        lcdHello();
       if (++bit > 10) {
 	if (++ch > sizeof(DATA)) {
 	  ch  = 0;

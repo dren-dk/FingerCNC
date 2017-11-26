@@ -16,7 +16,7 @@ AVR_PROGRAMMER ?= -c atmelice_isp -P usb
 
 FW = ../atmega8
 
-CSRC  = $(wildcard $(FW)/*.c)   $(wildcard $(FW)/*/*.c)   $(wildcard *.c)   $(wildcard */*.c)
+CSRC  = $(wildcard $(FW)/*.c)   $(wildcard $(FW)/*/*.c)   $(wildcard *.c)   $(wildcard */*.c)    $(wildcard ../*/csrc/*.c)
 CPSRC = $(wildcard $(FW)/*.cpp) $(wildcard $(FW)/*/*.cpp) $(wildcard *.cpp) $(wildcard */*.cpp)
 
 OBJS = $(CSRC:%.c=%.o) $(CPSRC:%.cpp=%.o)
@@ -24,8 +24,9 @@ OBJS = $(CSRC:%.c=%.o) $(CPSRC:%.cpp=%.o)
 CC=avr-gcc
 SIZE=avr-size
 
+DISABLE_WARNINGS = -Wno-unused-function -Wno-overlength-strings
 
-CFLAGS  = -Wall -pedantic-errors -Werror -mcall-prologues -mmcu=$(AVR) -std=c99 -g
+CFLAGS  = -Wall $(DISABLE_WARNINGS) -pedantic-errors -Werror -mcall-prologues -mmcu=$(AVR) -std=c99 -g
 CFLAGS  += -I$(FW)
 
 
