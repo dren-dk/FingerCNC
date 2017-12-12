@@ -1,4 +1,4 @@
-PROJ=firmware
+PROJ=fingerer
 
 include ../atmega8/makefile
 
@@ -7,3 +7,8 @@ AVR               = atmega2560
 UART_BAUD         = 115200
 F_CPU             = 16000000
 SLEEP_10_MS_COUNT = 79
+
+readfuses:
+	avrdude $(AVR_PROGRAMMER) -p $(AVR) -B 100 -U lfuse:r: -U hfuse:r
+fuses:
+	avrdude $(AVR_PROGRAMMER) -p $(AVR) -B 100 -U lfuse:w:0xe2:m -U hfuse:w:0xd4:m

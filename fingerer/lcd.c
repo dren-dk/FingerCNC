@@ -50,7 +50,7 @@ uint8_t u8x8_gpio_and_delay(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *ar
         case U8X8_MSG_GPIO_SPI_DATA:   GPIO(H, 0, arg_int)
         case U8X8_MSG_GPIO_SPI_CLOCK:  GPIO(A, 1, arg_int)
         
-        case U8X8_MSG_DELAY_NANO: // When we get here 750 ns has already passed, so there's no point in doing anything else
+        case U8X8_MSG_DELAY_NANO: // When we get here 750 ns has already passed, so there's no point in doing anything 
             break;
         break;    
         case U8X8_MSG_DELAY_100NANO:            
