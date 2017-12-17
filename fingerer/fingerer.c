@@ -19,6 +19,7 @@
 #include "mstdio.h"
 
 #include "lcd.h"
+#include "inputs.h"
 
 void led(char on) {
   if (on) {
@@ -56,6 +57,7 @@ void initBoard() {
   muartInit();
   motorInit();
   lcdInit();
+  inputsInit();
 
   mprintf(PSTR("Power up\n"));
 }
@@ -92,9 +94,9 @@ int main(void) {
     //led(frame++ & 128);
     loopSleep();
     wdt_reset();
+    lcdHello();
 
     if (--len < 0) {
-        lcdHello();
       if (++bit > 10) {
 	if (++ch > sizeof(DATA)) {
 	  ch  = 0;

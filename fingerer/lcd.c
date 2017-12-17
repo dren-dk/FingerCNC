@@ -89,22 +89,27 @@ uint8_t u8x8_gpio_and_delay(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *ar
 
 
 void lcdInit()  {
-    u8g2_Setup_st7920_s_128x64_f(&u8g2, U8G2_R0, u8x8_byte_3wire_sw_spi, u8x8_gpio_and_delay); 
+    u8g2_Setup_st7920_s_128x64_f(&u8g2, U8G2_R0, u8x8_byte_4wire_sw_spi, u8x8_gpio_and_delay); 
     u8g2_InitDisplay(&u8g2);    
 
     u8g2_SetPowerSave(&u8g2, 0);    
  
     lcdHello();
-
 }
+
+uint8_t lcdCount = 0;
 
 void lcdHello() {
     u8g2_ClearBuffer(&u8g2);
 
-    u8g2_SetFont(&u8g2, u8x8_font_chroma48medium8_r);
-    u8g2_DrawStr(&u8g2, 15,15,"Hello World!");
+    u8g2_SetFont(&u8g2, u8g2_font_ncenB14_tr);
+    u8g2_DrawStr(&u8g2, 32, 32, "Hello!");
      
-    u8g2_DrawLine(&u8g2, 0,0, 127,63);
+    u8g2_DrawRFrame(&u8g2, 10, 10, 60, 40, 10);
+    u8g2_DrawLine(&u8g2, lcdCount,0, 127-lcdCount,63);
+    if (lcdCount++ > 127) {
+        lcdCount = 0;
+    }
     u8g2_DrawLine(&u8g2, 127,0, 0,63);  
     u8g2_SendBuffer(&u8g2);
 }
