@@ -29,7 +29,7 @@ to update the LCD, so the timer interrupt feeds events to the
 UI via a circular buffer.
 */ 
 
-#define BOUNCE_LIMIT 10
+#define BOUNCE_LIMIT 5
 int8_t bouncy[4];
 
 void update(Event event, uint8_t raw) {
@@ -56,16 +56,7 @@ void update(Event event, uint8_t raw) {
   }
 } 
 
-void wigglePE4() {
-  if (PORTE & _BV(PE4)) {
-    PORTE &=~ _BV(PE4);
-  } else {
-    PORTE |= _BV(PE4);
-  }
-}
-
 ISR(TIMER0_COMPA_vect) {
-  wigglePE4();
   update(EVENT_ENC_BTN, PINC & _BV(PC2));
   update(EVENT_ENC_A,   PINC & _BV(PC6));
   update(EVENT_ENC_B,   PINC & _BV(PC4));
@@ -79,7 +70,13 @@ void inputsInit() {
   DDRG &=~ _BV(PG0);
   DDRJ &=~ _BV(PJ1);
 
-  DDRE |= _BV(PE4); // Debug output
+  // And that pullups are enabled
+  PORTC |= _BV(PC2)|_BV(PC4)|_BV(PC6);
+  PORTE |= _BV(PE5)|_BV(PE4);
+  PORTG |= _BV(PG0);
+  PORTJ |= _BV(PJ1);
+
+  
 
   // Set up timer 0 to poll inputs
   TCNT0 = 0;

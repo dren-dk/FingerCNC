@@ -54,7 +54,8 @@ CFLAGS += -D F_CPU=$(F_CPU)
 
 CPPFLAGS=-fno-exceptions
 
-LDFLAGS = -lc -mmcu=$(AVR) -Wl,--gc-sections -Wl,-Map,$(PROJ).map -Wl,--print-gc-sections 
+LDFLAGS = -lc -mmcu=$(AVR) -Wl,--gc-sections -Wl,-Map,$(PROJ).map
+#LDFLAGS += -Wl,--print-gc-sections 
 LDFLAGS += -Wl,--relax
 
 #LDFLAGS += -L/usr/lib/avr/lib

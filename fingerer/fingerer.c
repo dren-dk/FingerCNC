@@ -20,6 +20,8 @@
 
 #include "lcd.h"
 #include "inputs.h"
+#include "events.h"
+
 
 void led(char on) {
   if (on) {
@@ -69,58 +71,20 @@ void loopSleep() {
   _delay_us(200);
 }
 
-/*
-  Symbol -> Modulation -> Periods  -> Steps
- */
-
-const char* DATA = "Test";
-const int BIT_PERIOD = 2*200*16;
-const char MARK = 0;
-const char SPACE = 1;
-
 int main(void) {
   initBoard();
 
-  int bit = 100;
-  int ch = 100;
-
-  // int frame = 0;
-  char motor = 0;
-  int len = 0;
-  
+  uint8_t ledState = 0;
   while (1) {
-    mputs("Hello\r\n");
-      
-    //led(frame++ & 128);
-    loopSleep();
     wdt_reset();
-    lcdHello();
-
-    if (--len < 0) {
-      if (++bit > 10) {
-	if (++ch > sizeof(DATA)) {
-	  ch  = 0;
-	}
-	bit = 0;      
-      }
-      
-      if (bit == 0) {         // Start bit
-	len = BIT_PERIOD;
-	motor = MARK; 
-      } else if (bit == 9) {  // Stop bits
-	len = BIT_PERIOD*2;
-	motor = SPACE;
-      } else if (bit == 10) { // Spacing
-	len = BIT_PERIOD*5;
-	motor = SPACE;
-      } else {
-	len = BIT_PERIOD;
-	motor = (_BV(bit-1) & DATA[ch]) ? 1:0;
-      }
+    
+    Event event = takeEvent();
+    if (event != EVENT_NONE) {
+      mprintf(PSTR("Got event: %d\r\n"), event);
+      led(ledState);
+      ledState = !ledState;
     }
 
-    led(motor);
-    
-    //    step(motor);
+    lcdHello();
   }
 }

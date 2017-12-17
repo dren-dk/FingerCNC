@@ -7,7 +7,7 @@ Event queue[CAPACITY];
 uint8_t head = 0;
 uint8_t tail = 0;
 
-uint8_t full() {
+uint8_t eventBufferFull() {
   if (tail == 0) {
     return head == CAPACITY-1;
   } else {
@@ -15,13 +15,13 @@ uint8_t full() {
   }
 }
 
-uint8_t empty() {
+uint8_t eventBufferEmpty() {
   return head == tail;
 }
 
 void addEvent(Event event) {
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-    if (full()) {
+    if (eventBufferFull()) {
       return;
     }
     queue[head++] = event;
@@ -34,7 +34,7 @@ void addEvent(Event event) {
 Event takeEvent() {
   Event result;
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-    if (empty()) {
+    if (eventBufferEmpty()) {
       result = EVENT_NONE;
     } else {
       result = queue[tail++];
