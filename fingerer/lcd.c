@@ -1,7 +1,6 @@
 #include "lcd.h"
 #include <avr/io.h>
 #include <util/delay_basic.h>
-#include "../u8g2/csrc/u8g2.h"
 
 /*
  The GPIO pins used for the lcd are:
@@ -14,29 +13,7 @@
 
 #define GPIO(p,pin,on) if (on) { PORT ## p |= _BV(P ## p ## pin); } else { PORT ## p &=~ _BV(P ## p ## pin); } break;
 
-u8g2_t u8g2;
-
 uint8_t u8x8_gpio_and_delay(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr);
-
-void wiggle(uint8_t a, uint8_t b) {
-    
-    u8x8_gpio_and_delay(0, U8X8_MSG_GPIO_SPI_DATA, 1, 0);
-    while (a || b) {
-        
-        if (a) {
-            u8x8_gpio_and_delay(0, U8X8_MSG_GPIO_CS, 1, 0);
-            a--;
-        }
-        if (b) {
-            u8x8_gpio_and_delay(0, U8X8_MSG_GPIO_SPI_CLOCK, 1, 0);
-            b--;
-        }
-        u8x8_gpio_and_delay(0, U8X8_MSG_GPIO_CS, 0, 0);
-        u8x8_gpio_and_delay(0, U8X8_MSG_GPIO_SPI_CLOCK, 0, 0);
-    }
-    u8x8_gpio_and_delay(0, U8X8_MSG_GPIO_SPI_DATA, 0, 0);
-}
-
 
 // This is the hardware "driver" that connects the u8g2 library to the actual hardware needed
 uint8_t u8x8_gpio_and_delay(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
@@ -81,22 +58,18 @@ uint8_t u8x8_gpio_and_delay(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *ar
         break;
 
         default:
-            wiggle(msg,arg_int);
             return 0;
     }
     return 1;
 }
 
-
 void lcdInit()  {
     u8g2_Setup_st7920_s_128x64_f(&u8g2, U8G2_R0, u8x8_byte_4wire_sw_spi, u8x8_gpio_and_delay); 
     u8g2_InitDisplay(&u8g2);    
-
     u8g2_SetPowerSave(&u8g2, 0);    
- 
-    lcdHello();
 }
 
+/*
 uint8_t lcdCount = 0;
 
 void lcdHello() {
@@ -113,5 +86,4 @@ void lcdHello() {
     u8g2_DrawLine(&u8g2, 127,0, 0,63);  
     u8g2_SendBuffer(&u8g2);
 }
-
-
+*/

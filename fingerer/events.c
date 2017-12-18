@@ -3,6 +3,7 @@
 
 #define CAPACITY 20
 Event queue[CAPACITY];
+Event previousEvent = EVENT_NONE;
 
 uint8_t head = 0;
 uint8_t tail = 0;
@@ -22,8 +23,12 @@ uint8_t eventBufferEmpty() {
 void addEvent(Event event) {
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
     if (eventBufferFull()) {
-      return;
+      return; // Discard overflowing events
     }
+    if (!eventBufferEmpty() && previousEvent==event) {
+      return; // Discard duplicate events
+    }
+    previousEvent = event;
     queue[head++] = event;
     if (head >= CAPACITY) {
       head = 0;

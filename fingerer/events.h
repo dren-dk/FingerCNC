@@ -7,9 +7,11 @@ typedef enum {
   EVENT_STOP = 3,
   
   EVENT_Y_MIN = 4,  
+  EVENT_X_MIN = 5,  
+  EVENT_X_MAX = 6,  
   
-  EVENT_NOT = 128,
-  EVENT_NONE = 255
+  EVENT_ACTIVE = 128,
+  EVENT_NONE = 255,
 } Event;
 
 void addEvent(Event event);

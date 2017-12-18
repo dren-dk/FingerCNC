@@ -21,7 +21,7 @@
 #include "lcd.h"
 #include "inputs.h"
 #include "events.h"
-
+#include "ui.h"
 
 void led(char on) {
   if (on) {
@@ -55,11 +55,11 @@ void initBoard() {
   DDRB  |= _BV(PB7);  // LED output
   led(1);
 
-  //  initADC();
   muartInit();
   motorInit();
   lcdInit();
   inputsInit();
+  uiInit();
 
   mprintf(PSTR("Power up\n"));
 }
@@ -73,18 +73,8 @@ void loopSleep() {
 
 int main(void) {
   initBoard();
-
-  uint8_t ledState = 0;
+  
   while (1) {
-    wdt_reset();
-    
-    Event event = takeEvent();
-    if (event != EVENT_NONE) {
-      mprintf(PSTR("Got event: %d\r\n"), event);
-      led(ledState);
-      ledState = !ledState;
-    }
-
-    lcdHello();
+    uiHandleEvents();
   }
 }

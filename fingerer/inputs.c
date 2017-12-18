@@ -1,5 +1,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <string.h>
 
 #include "inputs.h"
 #include "events.h"
@@ -26,13 +27,26 @@ to do input polling and debouncing.
 
 The main process is quite slow as it's loaded down by having
 to update the LCD, so the timer interrupt feeds events to the
-UI via a circular buffer.
+UI via a circular buffer, see events.h for how to consume the
+events.
 */ 
 
-#define BOUNCE_LIMIT 5
-int8_t bouncy[4];
+int16_t encoderPosition = 0;
+int8_t encoderDirection = 0;
 
-void update(Event event, uint8_t raw) {
+int16_t getEncoderPosition() {
+  return encoderPosition;
+}
+
+void setEncoderPosition(uint16_t pos) {
+  encoderPosition = pos;
+}
+
+#define BOUNCE_LIMIT 5
+int8_t bouncy[7];
+
+
+void updateDebounceCounters(Event event, uint8_t raw) {
   int8_t old = bouncy[event];
   
   if (raw) {
@@ -41,7 +55,13 @@ void update(Event event, uint8_t raw) {
     } else if (old < BOUNCE_LIMIT) {
       bouncy[event] = old+1;
       if (old == BOUNCE_LIMIT-1) {
-	addEvent(event);
+	if (event == EVENT_ENC_A) {
+	  // Ignore
+	} else if (event == EVENT_ENC_B) {
+	  encoderDirection = +1;
+	} else {
+	  addEvent(event);	  
+	}
       }
     }
   } else {
@@ -50,17 +70,41 @@ void update(Event event, uint8_t raw) {
     } else if (old > -BOUNCE_LIMIT) {
       bouncy[event] = old-1;
       if (old == -(BOUNCE_LIMIT-1)) {
-	addEvent(event | EVENT_NOT);
+	if (event == EVENT_ENC_A) {
+	  encoderPosition += encoderDirection;
+	  addEvent(event);
+	  
+	} else if (event == EVENT_ENC_B) {
+	  encoderDirection = -1;
+	  
+	} else {
+	  addEvent(event | EVENT_ACTIVE);	  
+	}
       }
     }    
   }
 } 
 
 ISR(TIMER0_COMPA_vect) {
-  update(EVENT_ENC_BTN, PINC & _BV(PC2));
-  update(EVENT_ENC_A,   PINC & _BV(PC6));
-  update(EVENT_ENC_B,   PINC & _BV(PC4));
-  update(EVENT_STOP,    PING & _BV(PG0));
+  updateDebounceCounters(EVENT_ENC_BTN, PINC & _BV(PC2));
+  updateDebounceCounters(EVENT_ENC_A,   PINC & _BV(PC6));
+  updateDebounceCounters(EVENT_ENC_B,   PINC & _BV(PC4));
+  updateDebounceCounters(EVENT_STOP,    PING & _BV(PG0));
+  updateDebounceCounters(EVENT_X_MIN,   readXMin());
+  updateDebounceCounters(EVENT_X_MAX,   readXMax());
+  updateDebounceCounters(EVENT_Y_MIN,   readYMin());
+}
+
+uint8_t readXMin() {
+  return PINE & _BV(PE5);
+}
+
+uint8_t readXMax() {
+  return PINE & _BV(PE4);
+}
+
+uint8_t readYMin() {
+  return PINJ & _BV(PJ1);
 }
 
 void inputsInit() {
@@ -75,8 +119,6 @@ void inputsInit() {
   PORTE |= _BV(PE5)|_BV(PE4);
   PORTG |= _BV(PG0);
   PORTJ |= _BV(PJ1);
-
-  
 
   // Set up timer 0 to poll inputs
   TCNT0 = 0;

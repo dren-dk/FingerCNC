@@ -59,10 +59,8 @@ The AKA. column refers to the name of the signal on the smart adaptor or the RAM
 
 ## The serial port
 
-The serial port accessible via the USB port runs at 1 Mbps, because that's the highest baud rate
-possible at 16 MHz and it's possible without any error.
-
-115200 bps is not possible to hit without a very large error.
+The serial port accessible via the USB runs at 1 Mbps, because that's the highest baud rate
+possible at 16 MHz and there's no baud-rate error, unlike the more standard 115200.
 
 
 ## Feature numbering
