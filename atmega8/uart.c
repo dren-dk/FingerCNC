@@ -18,32 +18,13 @@
 
 #include "uart.h"
 
-
-/*
- * Initialize the UART to 9600 Bd, tx/rx, 8N1.
- */
-void uart_init(void) {
-#if F_CPU < 2000000UL && defined(U2X)
-  UCSR0A = _BV(U2X);             /* improve baud rate error by using 2x clk */
-  UBRR0L = (F_CPU / (8UL * UART_BAUD)) - 1;
-#else
-  UBRR0L = (F_CPU / (16UL * UART_BAUD)) - 1;
-#endif
-  UCSR0B = _BV(TXEN0) | _BV(RXEN0); /* tx/rx enable */
-  //UCSRB = _BV(TXEN); /* tx enable */
-}
-
-/*
- * Send character c down the UART Tx, wait until tx holding register
- * is empty.
- */
 int uart_putchar(char c, FILE *stream){
 
-  //  if (c == '\n')
-  //uart_putchar('\r', stream);
+  if (c == '\n') {
+    uart_putchar('\r', stream);
+  }
   loop_until_bit_is_set(UCSR0A, UDRE0);
   UDR0 = c;
-  loop_until_bit_is_set(UCSR0A, UDRE0);
   
   return 0;
 }
@@ -51,14 +32,27 @@ int uart_putchar(char c, FILE *stream){
 int uart_getchar(FILE *stream) {
 
   if (UCSR0A & 1<<RXC0) {
-	if (UCSR0A & _BV(FE0))
-	  return _FDEV_EOF;
-	if (UCSR0A & _BV(DOR0))
-	  return _FDEV_ERR;
-	
-	return UDR0;
+    if (UCSR0A & _BV(FE0))
+      return _FDEV_EOF;
+    if (UCSR0A & _BV(DOR0))
+      return _FDEV_ERR;
+    
+    return UDR0;
   } else {
-	return -1000;
+    return -1000;
   }
+}
+
+void uartInit(void) {
+  UCSR0A = _BV(U2X0);   
+  UBRR0H = 0;
+  UBRR0L = (F_CPU / (8UL * UART_BAUD)) - 1;
+  UCSR0B = _BV(TXEN0) | _BV(RXEN0); /* tx/rx enable */
+  
+  static FILE uart_output = FDEV_SETUP_STREAM(uart_putchar, NULL, _FDEV_SETUP_WRITE);
+  static FILE uart_input = FDEV_SETUP_STREAM(NULL, uart_getchar, _FDEV_SETUP_READ);
+  
+  stdout = &uart_output;
+  stdin  = &uart_input;
 }
 

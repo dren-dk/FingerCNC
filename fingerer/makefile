@@ -12,3 +12,11 @@ readfuses:
 	avrdude $(AVR_PROGRAMMER) -p $(AVR) -B 100 -U lfuse:r: -U hfuse:r
 fuses:
 	avrdude $(AVR_PROGRAMMER) -p $(AVR) -B 100 -U lfuse:w:0xce:m -U hfuse:w:0xd4:m
+
+events.o:: events.h eventnames.h eventnames.c
+
+eventnames.h: generate-eventnames
+	./generate-eventnames
+
+eventnames.c: generate-eventnames
+	./generate-eventnames

@@ -16,12 +16,14 @@
 #include <avr/pgmspace.h>
 #include <avr/eeprom.h> 
 
-#include "mstdio.h"
+#include "stdio.h"
 
 #include "lcd.h"
 #include "inputs.h"
 #include "events.h"
 #include "ui.h"
+#include "motor.h"
+#include "uart.h"
 
 void led(char on) {
   if (on) {
@@ -31,44 +33,20 @@ void led(char on) {
   }
 }
 
-void motorInit() {
-  DDRD |= _BV(PD7);
-  DDRF |= _BV(PF0);
-  DDRF |= _BV(PF1);
-  DDRF |= _BV(PF2);
-  DDRF |= _BV(PF6);
-  DDRF |= _BV(PF7);
-}
-
-void step(char motor) {
-  if (motor) {
-    PORTF |= _BV(PF0);
-    PORTF &= ~_BV(PF0);    
-  } else {
-    PORTF |= _BV(PF6);
-    PORTF &= ~_BV(PF6);    
-  }
-}
-
 void initBoard() {
   wdt_enable(WDTO_4S);
   DDRB  |= _BV(PB7);  // LED output
   led(1);
 
-  muartInit();
+  uartInit();
+  printf_P(PSTR("Powering up\n"));
   motorInit();
   lcdInit();
   inputsInit();
   uiInit();
 
-  mprintf(PSTR("Power up\n"));
-}
-
-#define nop() asm volatile("nop")
-
-void loopSleep() {
-  //  _delay_us(350);
-  _delay_us(200);
+  led(0);
+  printf_P(PSTR("Ready\n"));
 }
 
 int main(void) {

@@ -4,6 +4,7 @@
 
 #include "inputs.h"
 #include "events.h"
+#include "motor.h"
 
 /*
 | Function  | AVR | Arduino | AKA.    | int     |
@@ -43,7 +44,7 @@ void setEncoderPosition(uint16_t pos) {
 }
 
 #define BOUNCE_LIMIT 5
-int8_t bouncy[7];
+int8_t bouncy[EVENTS_USED];
 
 
 void updateDebounceCounters(Event event, uint8_t raw) {
@@ -60,7 +61,10 @@ void updateDebounceCounters(Event event, uint8_t raw) {
 	} else if (event == EVENT_ENC_B) {
 	  encoderDirection = +1;
 	} else {
-	  addEvent(event);	  
+	  addEvent(event);
+	  if (event == EVENT_STOP) {
+	    enableXMotor(0); 
+	  }
 	}
       }
     }
@@ -86,21 +90,22 @@ void updateDebounceCounters(Event event, uint8_t raw) {
 } 
 
 ISR(TIMER0_COMPA_vect) {
+  motorPoll();
   updateDebounceCounters(EVENT_ENC_BTN, PINC & _BV(PC2));
   updateDebounceCounters(EVENT_ENC_A,   PINC & _BV(PC6));
   updateDebounceCounters(EVENT_ENC_B,   PINC & _BV(PC4));
   updateDebounceCounters(EVENT_STOP,    PING & _BV(PG0));
   updateDebounceCounters(EVENT_X_MIN,   readXMin());
   updateDebounceCounters(EVENT_X_MAX,   readXMax());
-  updateDebounceCounters(EVENT_Y_MIN,   readYMin());
+  updateDebounceCounters(EVENT_Y_MIN,   readYMin());  
 }
 
 uint8_t readXMin() {
-  return PINE & _BV(PE5);
+  return !(PINE & _BV(PE5));
 }
 
 uint8_t readXMax() {
-  return PINE & _BV(PE4);
+  return !(PINE & _BV(PE4));
 }
 
 uint8_t readYMin() {
@@ -116,9 +121,8 @@ void inputsInit() {
 
   // And that pullups are enabled
   PORTC |= _BV(PC2)|_BV(PC4)|_BV(PC6);
-  PORTE |= _BV(PE5)|_BV(PE4);
   PORTG |= _BV(PG0);
-  PORTJ |= _BV(PJ1);
+  PORTE |= _BV(PE5) | _BV(PE4);
 
   // Set up timer 0 to poll inputs
   TCNT0 = 0;
@@ -128,3 +132,5 @@ void inputsInit() {
   TIMSK0 |= _BV(OCIE0A); // Interrupt on compare A
   sei();
 }
+
+

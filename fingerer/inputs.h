@@ -1,5 +1,7 @@
 #pragma once
 
+#include <inttypes.h>
+
 void inputsInit();
 
 int16_t getEncoderPosition();
