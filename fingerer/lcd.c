@@ -72,6 +72,9 @@ uint8_t sw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
 
   if (msg == U8X8_MSG_BYTE_SEND) {
     uint8_t* data = (uint8_t *)arg_ptr;
+    uint8_t clockSet = PORTA;
+    uint8_t clockClear = clockSet & ~_BV(PA1);
+
     while( arg_int > 0 ) {
       uint8_t b = *data;
       data++;
@@ -81,8 +84,8 @@ uint8_t sw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
 	b <<= 1;
 
 	// Pulse the SPI clock
-	PORTA &=~ _BV(PA1);
-	PORTA |= _BV(PA1);
+	PORTA = clockClear;
+	PORTA = clockSet;
       }    
     }
 
