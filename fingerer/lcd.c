@@ -79,18 +79,11 @@ uint8_t sw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
       arg_int--;
       for (uint8_t i = 0; i < 8; i++ ) {
 	GPIO(H, 0, b & 128)
-
-	  /*  
-	if ( b & 128 ) {
-	  u8x8_gpio_SetSPIData(u8x8, 1);
-	} else {
-	  u8x8_gpio_SetSPIData(u8x8, 0);
-	}
-	  */
 	b <<= 1;
-	
-	u8x8_gpio_SetSPIClock(u8x8, not_takeover_edge);
-	u8x8_gpio_SetSPIClock(u8x8, takeover_edge);
+
+	// Pulse the SPI clock
+	GPIO(A, 1, not_takeover_edge)
+	GPIO(A, 1, takeover_edge)
       }    
     }
 
