@@ -87,9 +87,7 @@ uint8_t sw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
 	  b <<= 1;
 	  
 	  u8x8_gpio_SetSPIClock(u8x8, not_takeover_edge);
-	  u8x8_gpio_Delay(u8x8, U8X8_MSG_DELAY_NANO, u8x8->display_info->sda_setup_time_ns);
 	  u8x8_gpio_SetSPIClock(u8x8, takeover_edge);
-	  u8x8_gpio_Delay(u8x8, U8X8_MSG_DELAY_NANO, u8x8->display_info->sck_pulse_width_ns);
 	}    
       }
       
