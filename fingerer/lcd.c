@@ -91,10 +91,8 @@ uint8_t sw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
     }
 
   } else if (msg == U8X8_MSG_BYTE_INIT) {
-      // disable chipselect 
-      u8x8_gpio_SetCS(u8x8, u8x8->display_info->chip_disable_level);
-        // for SPI: setup correct level of the clock signal
-      u8x8_gpio_SetSPIClock(u8x8, u8x8_GetSPIClockPhase(u8x8));
+    u8x8_gpio_SetCS(u8x8, u8x8->display_info->chip_disable_level);
+    u8x8_gpio_SetSPIClock(u8x8, u8x8_GetSPIClockPhase(u8x8));
 
   } else if (msg == U8X8_MSG_BYTE_SET_DC) {
     u8x8_gpio_SetDC(u8x8, arg_int);
