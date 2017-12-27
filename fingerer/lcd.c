@@ -6,6 +6,7 @@
 #include <util/delay_basic.h>
 
 #include "gpio.h"
+#include "debug.h"
 
 /*
  The GPIO pins used for the lcd are:
@@ -68,8 +69,6 @@ uint8_t u8x8_gpio_and_delay(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *ar
   This is a slightly re-written version of the u8x8_byte_4wire_sw_spi for better performance
  */
 uint8_t sw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
-  uint8_t takeover_edge = u8x8_GetSPIClockPhase(u8x8);
-  uint8_t not_takeover_edge = 1 - takeover_edge;
 
   if (msg == U8X8_MSG_BYTE_SEND) {
     uint8_t* data = (uint8_t *)arg_ptr;
@@ -82,8 +81,8 @@ uint8_t sw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
 	b <<= 1;
 
 	// Pulse the SPI clock
-	GPIO(A, 1, not_takeover_edge)
-	GPIO(A, 1, takeover_edge)
+	PORTA &=~ _BV(PA1);
+	PORTA |= _BV(PA1);
       }    
     }
 
