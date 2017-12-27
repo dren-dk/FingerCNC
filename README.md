@@ -55,7 +55,9 @@ The AKA. column refers to the name of the signal on the smart adaptor or the RAM
 | Enc-a     | PC6 | D31     | EXP2-3  |         |
 | Enc-b     | PC4 | D33     | EXP2-5  |         |
 | Stop      | PG0 | D41     | EXP2-8  |         |
-
+| Debug 0   | PG5 | D4      | Servo 4 |         |
+| Debug 1   | PE3 | D5      | Servo 3 |         |
+| Debug 2   | PH3 | D6      | Servo 2 |         |
 
 ## The serial port
 

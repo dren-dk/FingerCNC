@@ -8,6 +8,7 @@
 #include "lcd.h"
 #include "inputs.h"
 #include "motor.h"
+#include "debug.h"
 
 typedef enum {
   HOME_SCREEN,
@@ -24,6 +25,7 @@ void uiUpdate(Event event);
 
 
 void uiUpdateHome(Event event) {
+  setDebug0(1);
   
   if (event == (EVENT_ENC_BTN|EVENT_ACTIVE)) {
     if (yHome) {
@@ -46,7 +48,9 @@ void uiUpdateHome(Event event) {
     u8g2_DrawStr(&u8g2, 1, 60, "Move sled home");
   }
     
+  setDebug1(1);
   u8g2_SendBuffer(&u8g2);
+  setDebug(0);
 }
 
 void uiUpdateHomeing(Event event) {

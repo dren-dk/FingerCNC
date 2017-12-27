@@ -26,7 +26,7 @@ uint32_t stepsPerMm;     // Steps / mm
 uint32_t xAxisLength;    // mm
 
 // current move
-uint8_t moving;
+volatile uint8_t moving;
 uint16_t currentSpeed;         // Steps / second
 int32_t currentTargetPosition; // Steps
 int32_t currentPosition;       // Steps
@@ -39,7 +39,7 @@ uint8_t ticks;
 
 uint8_t homed;
 
-void motorStartMove(int32_t targetPosition);
+void motorStartMove(int32_t targetPosition, int32_t speed);
 
 uint8_t xHomed() {
   return homed;
@@ -59,7 +59,7 @@ void motorInit() {
 
   // TODO: Get these from the configuration
   accelerationPerTick = 10;
-  maxSpeed = 3000;
+  maxSpeed = 2500;
   minSpeed = 250;
   stepsPerMm = 200*2/2; // (full steps) * (microstepping) / (pitch)
   xAxisLength = 600;
@@ -107,47 +107,65 @@ void step() {
   PORTF &=~ _BV(PF0);
 }
 
+uint8_t handleHoming(uint8_t atMin, uint8_t atMax) {
+  if (homed == 0) {
+    // Going in the positive direction, expecting to get off xmin
+    if (atMax) {
+      stopMove();
+      P("Hit max limit @ %ld", currentPosition);
+      addEvent(EVENT_MOTOR_ERROR);
+    }
+
+  } if (homed == 1) {
+    // Going in the negative direction, expecting to hit xmin
+    if (atMin) {
+      stopMove();
+      homed = 2;
+      currentPosition = 0;	
+      motorStartMove(stepsPerMm*10, minSpeed);
+      return 1;
+    }
+  } else if (homed == 2) {
+    // Going in the positive direction, expecting to get off xmin
+    
+    if (!atMin) {
+      stopMove();
+      homed = 10;
+      currentPosition = 0;
+      addEvent(EVENT_X_AT_MIN | EVENT_ACTIVE);	  
+      return 1; 		
+    }
+  }
+
+  return 0; // Keep going
+}
+
+
 ISR(TIMER1_COMPA_vect) {
   uint8_t atMin = readXMin();
   uint8_t atMax = readXMax();
 
-  if (homed < 2) {
-    if (homed == 0) {
-      // Going in the negative direction, expecting to hit xmin
-      if (atMin) {
-	homed = 1;
-	currentPosition = 0;	
-	stopMove();
-	motorStartMove(stepsPerMm*10);
-	return;
-      }
-    } else if (homed == 1) {
-      // Going in the positive direction, expecting to get off xmin
-
-      if (!atMin) {
-	homed = 2;
-	currentPosition = 0;
-	addEvent(EVENT_X_AT_MIN | EVENT_ACTIVE);	  
-	stopMove();
-	return;		
-      }
+  if (homed < 10) {
+    uint8_t stop = handleHoming(atMin, atMax);
+    if (stop) {
+      return;
     }
     
   } else {
 
     if (currentDirection < 0) {
       if (atMin) {  
+	stopMove();
 	P("Hit min limit @ %ld", currentPosition);
 	addEvent(EVENT_MOTOR_ERROR);
-	stopMove();
 	return;
       }
       
     } else {
       if (atMax) {  
+	stopMove();
 	P("Hit max limit @ %ld", currentPosition);
 	addEvent(EVENT_MOTOR_ERROR);
-	stopMove();
 	return;      
       }      
     }
@@ -184,7 +202,7 @@ ISR(TIMER1_COMPA_vect) {
     if (!--decelerateDistance) {      
       stopMove();
 
-      if (homed < 2) {
+      if (homed < 10) {
 	P("Ran out of patience searching for endstop %d\n", homed);	
       }
     }
@@ -244,10 +262,10 @@ int32_t intersectionDistance(int32_t initialrate,
 }	
 
 void motorMoveTo(int32_t targetPositionum) {
-  motorStartMove(stepsPerMm*targetPositionum / 1000);
+  motorStartMove(stepsPerMm*targetPositionum / 1000, maxSpeed);
 }
 
-void motorStartMove(int32_t targetPosition) {
+void motorStartMove(int32_t targetPosition, int32_t speed) {
   if (moving) {
     L("Error: Cannot start move while moving");
     return;
@@ -274,15 +292,20 @@ void motorStartMove(int32_t targetPosition) {
     length = -length;
   }
 
-  
   currentSpeed = minSpeed;
+  if (speed > maxSpeed) {
+    speed = maxSpeed;    
+  }
+  if (speed < minSpeed) {
+    speed = minSpeed;    
+  }  
 
   accelerateDistance = estimateAccelerationDistance(minSpeed,
-						    maxSpeed,
+						    speed,
 						    accelerationPerTick);
   
   decelerateDistance = estimateAccelerationDistance(maxSpeed,
-						    minSpeed,
+						    speed,
 						    -accelerationPerTick);
   P("Moving from %ld to %ld len=%ld dir=%d ad=%ld dd=%ld\r\n",
     currentPosition, targetPosition, length, currentDirection,
@@ -333,7 +356,12 @@ void motorStartMove(int32_t targetPosition) {
 void motorHome() {
   enableXMotor(1);
   homed = 0;
-  motorStartMove(-1);
+  currentPosition = 0;
+  motorStartMove(10*stepsPerMm, maxSpeed);
+  while (moving) {
+  }
+  homed=1;
+  motorStartMove(-1, maxSpeed);
 }
 
 uint8_t motorMoving() {

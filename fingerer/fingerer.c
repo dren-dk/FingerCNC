@@ -24,29 +24,22 @@
 #include "ui.h"
 #include "motor.h"
 #include "uart.h"
-
-void led(char on) {
-  if (on) {
-    PORTB &=~ _BV(PB7);   
-  } else {
-    PORTB |= _BV(PB7);   
-  }
-}
+#include "debug.h"
 
 void initBoard() {
   wdt_enable(WDTO_4S);
-  DDRB  |= _BV(PB7);  // LED output
-  led(1);
+  initDebug();
+  setLed(1);
 
   uartInit();
-  printf_P(PSTR("Powering up\n"));
+  L("Powering up\n");
   motorInit();
   lcdInit();
   inputsInit();
   uiInit();
 
-  led(0);
-  printf_P(PSTR("Ready\n"));
+  setLed(0);
+  L("Ready\n");
 }
 
 int main(void) {
