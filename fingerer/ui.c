@@ -12,9 +12,10 @@
 
 typedef enum {
   HOME_SCREEN,
-  HOMEING_SCREEN,
+  HOMING_SCREEN,
   CUT_SCREEN,
-  SETUP_SCREEN
+  SETUP_SCREEN,
+  EDIT_SCREEN,
 } UIScreen;
 
 uint8_t yHome;
@@ -25,11 +26,9 @@ void uiUpdate(Event event);
 
 
 void uiUpdateHome(Event event) {
-  setDebug0(1);
-  
   if (event == (EVENT_ENC_BTN|EVENT_ACTIVE)) {
     if (yHome) {
-      currentScreen = HOMEING_SCREEN;
+      currentScreen = HOMING_SCREEN;
       uiUpdate(EVENT_NONE);
       return;
     }
@@ -48,12 +47,10 @@ void uiUpdateHome(Event event) {
     u8g2_DrawStr(&u8g2, 1, 60, "Move sled home");
   }
     
-  setDebug1(1);
   u8g2_SendBuffer(&u8g2);
-  setDebug(0);
 }
 
-void uiUpdateHomeing(Event event) {
+void uiUpdateHoming(Event event) {
 
   if (event == EVENT_NONE) {
     motorHome(); // Start homing routine
@@ -115,6 +112,15 @@ void uiUpdateSetup(Event event) {
   u8g2_SendBuffer(&u8g2);  
 }
 
+void uiUpdateEdit(Event event) {
+  u8g2_ClearBuffer(&u8g2);
+  
+  u8g2_SetFont(&u8g2, u8g2_font_6x12_te);
+  u8g2_DrawStr(&u8g2, 1, 63, "Edit screen");
+
+  u8g2_SendBuffer(&u8g2);  
+}
+
 void uiUpdate(Event event) {
 
   if (event == EVENT_Y_MIN || event == (EVENT_Y_MIN | EVENT_ACTIVE)) {
@@ -133,22 +139,24 @@ void uiUpdate(Event event) {
   if (currentScreen == HOME_SCREEN) {
     uiUpdateHome(event);
 
-  } else if (currentScreen == HOMEING_SCREEN) {
-    uiUpdateHomeing(event);
+  } else if (currentScreen == HOMING_SCREEN) {
+    uiUpdateHoming(event);
     
   } else if (currentScreen == CUT_SCREEN) {
     uiUpdateCut(event);
     
   } else if (currentScreen == SETUP_SCREEN) {
     uiUpdateSetup(event);
+
+  } else if (currentScreen == EDIT_SCREEN) {
+    uiUpdateEdit(event);
   }
 }
 
 void uiInit() {
-  currentScreen = HOME_SCREEN;
+  currentScreen = SETUP_SCREEN;
+  //  currentScreen = HOME_SCREEN;
   uiUpdate(EVENT_NONE);
-  
-  printf_P(PSTR("Event max: %d\n"), EVENTS_USED);
 }
 
 void uiHandleEvents() {

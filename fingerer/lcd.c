@@ -66,27 +66,29 @@ uint8_t u8x8_gpio_and_delay(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *ar
 }
 
 /*
-  This is a slightly re-written version of the u8x8_byte_4wire_sw_spi for better performance
+  This is a slightly re-written version of the u8x8_byte_4wire_sw_spi function for better performance
+
+  u8x8_byte_4wire_sw_spi is really slow at 352 ms per full screen update (23 kb/s)
+  this implementation is slightly faster at 28 ms per update (290kb/s).
+  still not as fast as hw spi which ought to be able to 8 Mb/s
  */
 uint8_t sw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
-
   if (msg == U8X8_MSG_BYTE_SEND) {
     uint8_t* data = (uint8_t *)arg_ptr;
     uint8_t clockSet = PORTA;
     uint8_t clockClear = clockSet & ~_BV(PA1);
 
-    while( arg_int > 0 ) {
+    while (arg_int > 0) {
       uint8_t b = *data;
       data++;
       arg_int--;
-      for (uint8_t i = 0; i < 8; i++ ) {
+      uint8_t i = 8;
+      do {
+	PORTA = clockClear;
 	GPIO(H, 0, b & 128)
 	b <<= 1;
-
-	// Pulse the SPI clock
-	PORTA = clockClear;
 	PORTA = clockSet;
-      }    
+      } while (--i);   
     }
 
   } else if (msg == U8X8_MSG_BYTE_INIT) {
@@ -111,27 +113,8 @@ uint8_t sw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
 }
 
 void lcdInit()  {
-  //u8g2_Setup_st7920_s_128x64_f(&u8g2, U8G2_R0, u8x8_byte_4wire_sw_spi, u8x8_gpio_and_delay); 
+  //u8g2_Setup_st7920_s_128x64_f(&u8g2, U8G2_R0, u8x8_byte_4wire_sw_spi, u8x8_gpio_and_delay);
   u8g2_Setup_st7920_s_128x64_f(&u8g2, U8G2_R0, sw_spi, u8x8_gpio_and_delay); 
   u8g2_InitDisplay(&u8g2);    
   u8g2_SetPowerSave(&u8g2, 0);    
 }
-
-/*
-uint8_t lcdCount = 0;
-
-void lcdHello() {
-    u8g2_ClearBuffer(&u8g2);
-
-    u8g2_SetFont(&u8g2, u8g2_font_ncenB14_tr);
-    u8g2_DrawStr(&u8g2, 32, 32, "Hello!");
-     
-    u8g2_DrawRFrame(&u8g2, 10, 10, 60, 40, 10);
-    u8g2_DrawLine(&u8g2, lcdCount,0, 127-lcdCount,63);
-    if (lcdCount++ > 127) {
-        lcdCount = 0;
-    }
-    u8g2_DrawLine(&u8g2, 127,0, 0,63);  
-    u8g2_SendBuffer(&u8g2);
-}
-*/

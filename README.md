@@ -104,14 +104,14 @@ The first cut on board B is the left edge of space 1.
 * Home screen (stop returns to this page)
  * Logo 
  * X axis motor off
- * Move Sled home / click encoder to start 
-
-* Run screen (Motor enables and homes x-axis, when at Y-min) 
+ * Move Sled home
+ * Click encoder to start 
+* Homing screen
+* Run screen
  * Space/Finger size
  * Pick A/B board (X axis moves to first cut, when selecting) 
  * Pick space (X axis moves to first cut of space, when selecting)
  * Ready to cut / Moving / Error indicator 
- 
  * Immediate stop if X is moving and Y isn't at min -> Error
  
 * Config option list
@@ -122,9 +122,23 @@ The first cut on board B is the left edge of space 1.
  * Min speed mm/s
  * Speed mm/s
  * Accel mm/s²
- 
- 
- 
- 
-    
-    
+
+
+== Persistent editable paramters
+
+These are the parameters that are used to configure the controller
+and are stored in EEPROM for persistence.
+
+| Index | Parameter           |     type | unit  | quantum   | Editor |
+|-------|---------------------|----------|-------|-----------|--------|
+|     0 | Gearing    	      | uint32_t |       | steps/mm  |    int |
+|     1 | Blade width  	      | uint32_t |   mm  | step size |  fixed |
+|     2 | Space/Finger size   | uint32_t |   mm  | step size |  fixed |
+|     3 | Offset of home      | uint32_t |   mm  | step size |  fixed |
+|     4 | A/B board           | uint8_t  |       | 1         |   enum |
+|     5 | Space               | uint8_t  |       | 1         |    int |
+|     6 | Stride	      | uint8_t  |    %  | 1         |    int |
+|     7 | Min speed	      | uint32_t | mm/s  | step size |  fixed |
+|     8 | Speed		      | uint32_t | mm/s  | step size |  fixed |
+|     9 | Accel		      | uint8_t	 | mm/s² | step/ms²  |  fixed |
+

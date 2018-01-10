@@ -122,7 +122,7 @@ uint8_t handleHoming(uint8_t atMin, uint8_t atMax) {
       stopMove();
       homed = 2;
       currentPosition = 0;	
-      motorStartMove(stepsPerMm*10, minSpeed);
+      motorStartMove(stepsPerMm*600, minSpeed);
       return 1;
     }
   } else if (homed == 2) {
@@ -357,7 +357,7 @@ void motorHome() {
   enableXMotor(1);
   homed = 0;
   currentPosition = 0;
-  motorStartMove(10*stepsPerMm, maxSpeed);
+  motorStartMove(2*stepsPerMm, maxSpeed);
   while (moving) {
   }
   homed=1;
