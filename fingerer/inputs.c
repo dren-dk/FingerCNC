@@ -43,7 +43,7 @@ void setEncoderPosition(uint16_t pos) {
   encoderPosition = pos;
 }
 
-#define BOUNCE_LIMIT 5
+#define BOUNCE_LIMIT 3
 int8_t bouncy[EVENTS_USED];
 
 

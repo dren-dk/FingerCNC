@@ -4,6 +4,8 @@
 #include <stdio.h>
 
 #include "ui.h"
+#include "uiSetup.h"
+
 #include "events.h"
 #include "lcd.h"
 #include "inputs.h"
@@ -23,7 +25,6 @@ uint8_t stop;
 
 UIScreen currentScreen;
 void uiUpdate(Event event);
-
 
 void uiUpdateHome(Event event) {
   if (event == (EVENT_ENC_BTN|EVENT_ACTIVE)) {
@@ -100,15 +101,6 @@ void uiUpdateCut(Event event) {
     u8g2_DrawStr(&u8g2, 1, 60, "Cut screen");
   }
   
-  u8g2_SendBuffer(&u8g2);  
-}
-
-void uiUpdateSetup(Event event) {
-  u8g2_ClearBuffer(&u8g2);
-  
-  u8g2_SetFont(&u8g2, u8g2_font_6x12_te);
-  u8g2_DrawStr(&u8g2, 1, 63, "Setup screen");
-
   u8g2_SendBuffer(&u8g2);  
 }
 
