@@ -63,9 +63,9 @@ uint32_t valueToDisplay(ConfigParam* cp, uint32_t v) {
 }
 
 void ic(ConfigId id, const char *name, const char *unit, uint32_t divisor, uint8_t decimals,
-	uint32_t def, uint32_t min, uint32_t max, uint8_t setDefault) {
+	uint32_t def, uint32_t min, uint32_t max) {
   ConfigParam* cp = getConfigParam(id);
-  
+  cp->id = id;
   cp->name = name;
   cp->unit = unit;
   cp->divisor = divisor;
@@ -75,12 +75,13 @@ void ic(ConfigId id, const char *name, const char *unit, uint32_t divisor, uint8
   cp->max = max;
 
   uint32_t *eepromAddress = (uint32_t *)(4+id*4);
-  if (setDefault) {
-    eeprom_write_dword(eepromAddress, cp->value = displayToValue(cp, cp->def));
-  } else {
-    cp->value = eeprom_read_dword(eepromAddress);
-  }  
+  cp->value = eeprom_read_dword(eepromAddress);
 }
+
+void storeConfig(ConfigParam *cp) {
+  uint32_t *eepromAddress = (uint32_t *)(4+cp->id*4);
+  eeprom_write_dword(eepromAddress, cp->value);
+}  
 
 const uint32_t STEPS_MM = 0;
 
@@ -88,28 +89,25 @@ const char MM[] PROGMEM = "mm";
 const char MMPS[] PROGMEM = "mm/s";
 
 void initConfig() {
-  uint32_t magic = eeprom_read_dword(0);
-  uint8_t setDefault = magic != EEPROM_MAGIC;
-  P("EEPROM magic is %08lx => ", magic);
-  if (setDefault) {
-    L("Letting defaults");
-  } else {
-    L("Loading");
-  }
 
   // ID              Name                  Unit              divisor   d  def    min   max
-  ic(C_STEPS_PER_MM, PSTR("Gearing"),      PSTR("steps/mm"), 1,        0, 200,   50,   1200,  setDefault);
-  ic(C_BLADE_WIDTH,  PSTR("Blade Width"),  MM,               STEPS_MM, 3, 2000,  1000, 6000,  setDefault);
-  ic(C_FINGER_WIDTH, PSTR("Finger Width"), MM,               STEPS_MM, 3, 1000,  1000, 10000, setDefault);
-  ic(C_HOME_OFFSET,  PSTR("Home Offset"),  MM,               STEPS_MM, 3, 0,     0,    60000, setDefault); 
-  ic(C_BOARD,        PSTR("Board"),        PSTR("A/B"),      1,        0, 0,     0,    1,     setDefault); 
-  ic(C_SPACE,        PSTR("Space"),        PSTR("n"),        1,        0, 0,     0,    100,   setDefault);
-  ic(C_STRIDE,       PSTR("Stride"),       PSTR("%"),        1,        0, 10,    50,   95,    setDefault);
-  ic(C_MIN_SPEED,    PSTR("Min Speed"),    MMPS,             STEPS_MM, 2, 1250,  100,  50000, setDefault);
-  ic(C_SPEED,        PSTR("Speed"),        MMPS,             STEPS_MM, 2, 1250,  100,  50000, setDefault);
-  ic(C_ACCELERATION, PSTR("Acceleration"), PSTR("mm/s²"),    STEPS_MM, 0, 5,     50,   10000, setDefault);
-
-  if (setDefault) {
+  ic(C_STEPS_PER_MM, PSTR("Gearing"),      PSTR("steps/mm"), 1,        0, 200,   25,   8000);
+  ic(C_BLADE_WIDTH,  PSTR("Blade Width"),  MM,               STEPS_MM, 3, 2000,  1000, 6000);
+  ic(C_FINGER_WIDTH, PSTR("Finger Width"), MM,               STEPS_MM, 3, 1000,  1000, 50000);
+  ic(C_HOME_OFFSET,  PSTR("Home Offset"),  MM,               STEPS_MM, 3, 0,     0,    60000); 
+  ic(C_BOARD,        PSTR("Board"),        PSTR("A/B"),      1,        0, 0,     0,    1); 
+  ic(C_SPACE,        PSTR("Space"),        PSTR("n"),        1,        0, 0,     0,    100);
+  ic(C_STRIDE,       PSTR("Stride"),       PSTR("%"),        1,        0, 50,    5,    95);
+  ic(C_MIN_SPEED,    PSTR("Min Speed"),    MMPS,             STEPS_MM, 2, 1250,  100,  50000);
+  ic(C_SPEED,        PSTR("Speed"),        MMPS,             STEPS_MM, 2, 1250,  100,  50000);
+  ic(C_ACCELERATION, PSTR("Acceleration"), PSTR("mm/s²"),    STEPS_MM, 0, 5,     50,   10000);
+  
+  if (eeprom_read_dword(0) != EEPROM_MAGIC) {
+    for (ConfigId i=0 ; i<CONFIGS_USED ; i++) {
+      ConfigParam* cp = getConfigParam(i);
+      cp->value = displayToValue(cp, cp->def);
+      storeConfig(cp);
+    }
     eeprom_write_dword(0, EEPROM_MAGIC);
   }
   

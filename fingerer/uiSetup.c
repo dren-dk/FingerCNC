@@ -1,5 +1,8 @@
 #include <stdio.h>
 
+#include "uart.h"
+
+#include "ui.h"
 #include "uiSetup.h"
 #include "lcd.h"
 #include "config.h"
@@ -9,13 +12,13 @@ const uint8_t MAX_CHARS = 20;
 const uint8_t MAX_LINES = 6;
 const uint8_t LINE_HEIGHT = 11;
 
-uint8_t setupTop;
-uint8_t setupCurrent;
+uint8_t setupTop = 0;
+uint8_t setupCurrent = 0;
 
-void initSetup() {
-  setupTop = 0;
-  setupCurrent = 0;
-  setEncoderPosition(0);
+void uiStartSetup() {
+  L("Starting Setup\n");
+  setEncoderPosition(setupCurrent);
+  uiSetScreen(SETUP_SCREEN);
 }
 
 void drawOption(uint8_t index, uint8_t y) {
@@ -37,10 +40,6 @@ void drawOption(uint8_t index, uint8_t y) {
 }
 
 void uiUpdateSetup(Event event) {
-  if (event == EVENT_NONE) {
-    initSetup();
-  }
-
   int16_t encPos = getEncoderPosition();
   if (encPos < 0) {
     encPos = CONFIGS_USED-1;
@@ -48,6 +47,11 @@ void uiUpdateSetup(Event event) {
     encPos = 0;
   }
   setEncoderPosition(setupCurrent = encPos);
+
+  if (event == (EVENT_ENC_BTN | EVENT_ACTIVE)) {
+    uiStartEdit(setupCurrent-1);
+    return;
+  }
 
   int8_t scroll = setupCurrent-setupTop;
   if (scroll < 0) {
@@ -59,7 +63,7 @@ void uiUpdateSetup(Event event) {
   u8g2_ClearBuffer(&u8g2); 
   u8g2_SetFont(&u8g2, u8g2_font_6x12_te);
 
-    
+   
   uint8_t setupBottom = setupTop + MAX_LINES;
   uint8_t y = 0;
   u8g2_SetFontMode(&u8g2, 0);

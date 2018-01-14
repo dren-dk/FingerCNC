@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include "ui.h"
+#include "uiEdit.h"
 #include "uiSetup.h"
 
 #include "events.h"
@@ -12,19 +13,16 @@
 #include "motor.h"
 #include "debug.h"
 
-typedef enum {
-  HOME_SCREEN,
-  HOMING_SCREEN,
-  CUT_SCREEN,
-  SETUP_SCREEN,
-  EDIT_SCREEN,
-} UIScreen;
-
 uint8_t yHome;
 uint8_t stop;
 
 UIScreen currentScreen;
 void uiUpdate(Event event);
+
+void uiSetScreen(UIScreen screen) {
+  currentScreen = screen;
+  uiUpdate(EVENT_NONE);
+}
 
 void uiUpdateHome(Event event) {
   if (event == (EVENT_ENC_BTN|EVENT_ACTIVE)) {
@@ -101,15 +99,6 @@ void uiUpdateCut(Event event) {
     u8g2_DrawStr(&u8g2, 1, 60, "Cut screen");
   }
   
-  u8g2_SendBuffer(&u8g2);  
-}
-
-void uiUpdateEdit(Event event) {
-  u8g2_ClearBuffer(&u8g2);
-  
-  u8g2_SetFont(&u8g2, u8g2_font_6x12_te);
-  u8g2_DrawStr(&u8g2, 1, 63, "Edit screen");
-
   u8g2_SendBuffer(&u8g2);  
 }
 

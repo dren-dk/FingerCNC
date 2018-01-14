@@ -16,8 +16,24 @@
 |     8 | Speed		      | uint32_t | mm/s  | step size |  fixed |
 |     9 | Accel		      | uint8_t	 | mm/s² | step/ms²  |  fixed |
 */
+typedef enum {
+  C_STEPS_PER_MM = 0,
+  C_BLADE_WIDTH = 1,
+  C_FINGER_WIDTH = 2,
+  C_HOME_OFFSET = 3,
+  C_BOARD = 4,
+  C_SPACE = 5,
+  C_STRIDE = 6,
+  C_MIN_SPEED = 7,
+  C_SPEED = 8,
+  C_ACCELERATION = 9,
+
+  // Insert config index enums above and don't reorder them EVER.
+  CONFIGS_USED
+} ConfigId;
 
 typedef struct ConfigParam {
+  ConfigId id;
   uint32_t value;   // Raw value as used by the code
   const char *name; // Name of parameter in pgmspace
   const char *unit; // Base unit of the paramter in pgmspace
@@ -38,25 +54,11 @@ typedef struct ConfigParam {
  dp = strlen(buffer)-decimals;
 */
 
-typedef enum {
-  C_STEPS_PER_MM = 0,
-  C_BLADE_WIDTH = 1,
-  C_FINGER_WIDTH = 2,
-  C_HOME_OFFSET = 3,
-  C_BOARD = 4,
-  C_SPACE = 5,
-  C_STRIDE = 6,
-  C_MIN_SPEED = 7,
-  C_SPEED = 8,
-  C_ACCELERATION = 9,
-
-  // Insert config index enums above and don't reorder them EVER.
-  CONFIGS_USED
-} ConfigId;
-
 void initConfig();
 uint32_t getConfigValue(ConfigId configId);
 ConfigParam* getConfigParam(ConfigId configId);
 
 uint32_t displayToValue(ConfigParam* cp, uint32_t dv);
 uint32_t valueToDisplay(ConfigParam* cp, uint32_t v);
+uint32_t pow10(uint8_t power);
+void storeConfig(ConfigParam *cp);

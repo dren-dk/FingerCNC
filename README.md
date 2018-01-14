@@ -118,13 +118,13 @@ The first cut on board B is the left edge of space 1.
  * Blade width mm
  * Stride % (50% overlap by default)
  * Offset of home position (X axis homes with X-min and moves to home position as this is adjusted)
- * Gearing: Steps per mm (1600 for 200x16 steps and TR8*2)
+ * Gearing: Steps per mm (200 for 200x2 steps and TR8*2)
  * Min speed mm/s
  * Speed mm/s
  * Accel mm/s²
 
 
-== Persistent editable paramters
+== Paramters
 
 These are the parameters that are used to configure the controller
 and are stored in EEPROM for persistence.
@@ -142,3 +142,86 @@ and are stored in EEPROM for persistence.
 |     8 | Speed		      | uint32_t | mm/s  | step size |  fixed |
 |     9 | Accel		      | uint8_t	 | mm/s² | step/ms²  |  fixed |
 
+
+=== Gearing (steps/mm)
+
+The number of steps per mm, you need the following bits of information to calculate it:
+* The number of physical full-steps on the motor per revolution.
+* The micro stepping setting of the motor driver.
+* The pitch of the lead screw.
+
+Typical bi-polar stepper motors have 200 steps per revolution (1.8 deg/step), though 400 steps also exist.
+
+Picking a micro stepping setting should be done so the largest possible steps can be used as accuracy and torque falls with higher micro stepping levels
+The highest torque is usually achived with half-stepping, so if that gives high enough resolution, then use that.
+
+The pitch of the screw is the length of advance per revolution, an M8 threaded rod has 1.5mm/rev and
+a tr8*2 lead screw has 2 mm/rev.
+
+As an example my machine uses a typical nema 14 motor with 200 steps/rev and I've set up half-stepping (2)
+and I'm using a Trapezoidal lead screw with a pich of 2mm/rev (tr8*2), so I get a gearing of
+200 steps/rev * 2 / 2 mm/rev = 200 steps/mm
+
+Note that changing the gearing changes almost all other settings, because they are stored in steps,
+so if you change this setting all other settings must be re-done.
+
+=== Blade width (mm)
+
+The blade width is nominally the width of the blade, but due to inaccuracies that compound,
+the actual kerf ends up being larger than this, so while you might start out by setting the
+blade width to the measured width of the teeth of the blade, you might find that the joints
+end up being too loose.
+
+Adjusting the blade is done by cutting a joint and if the joint is too:
+* Loose: Increase blade width.
+* Tight: Decrease blade width.
+
+=== Space/Finger size (mm)
+
+Choose whatever size you want, as long as it's larger than the blade width.
+
+Thinner fingers give more surface to glue, so the joing might be stronger.
+
+=== Offset of home (mm)
+
+Distance from the fixed endstop to the home location of the blade.
+
+This should be set so the blade just misses the edge of the material.
+
+=== A/B Board
+
+Simply selects between the A and the B pattern, 0=A, 1=B, see the feature numbering section.
+
+=== Space
+
+Simply selects the space that's currently being cut, see the feature numbering section.
+
+
+=== Stride (%)
+
+Desired advance of the x axis between cuts in percent of the blade width, so a 3mm blade
+and 50% will give a desired advance of 1.5mm.
+
+The actual advance is calculated so it ends up fitting withe notch width, so a 5mm notch gives,
+5 mm / 1.5mm = 3.33 cuts, which is impossible, so we round up to 4 cuts, which gives
+5 mm / 4 cuts = 1.25 mm/cut advance.
+
+=== Min speed (mm/s)
+
+The mechanics, motor specifications and motor current all conspire to impose a limit on how fast
+the motor can run if jumping into motion from standing still.
+
+This speed must be found by experimentation, find the speed that causes problems and divide by at least 2
+
+=== Speed (mm/s)
+
+Like with Min speed the physical realities limit how fast the motor can move the x axis.
+
+This speed must be found by experimentation, find the speed that causes problems and divide by at least 2
+
+
+=== Acceleration (mm/s²)
+
+Accelerating from min speed to speed or vice versa is done by a fixed rate of acceleration.
+
+This value must be found by experimentation, find the value that causes problems and divide by at least 2
