@@ -92,7 +92,7 @@ void initConfig() {
 
   // ID              Name                  Unit              divisor   d  def    min   max
   ic(C_STEPS_PER_MM, PSTR("Gearing"),      PSTR("steps/mm"), 1,        0, 200,   25,   8000);
-  ic(C_BLADE_WIDTH,  PSTR("Blade Width"),  MM,               STEPS_MM, 3, 2000,  1000, 6000);
+  ic(C_BLADE_WIDTH,  PSTR("Kerf"),         MM,               STEPS_MM, 3, 2000,  1000, 6000);
   ic(C_FINGER_WIDTH, PSTR("Finger Width"), MM,               STEPS_MM, 3, 1000,  1000, 50000);
   ic(C_HOME_OFFSET,  PSTR("Home Offset"),  MM,               STEPS_MM, 3, 0,     0,    60000); 
   ic(C_BOARD,        PSTR("Board"),        PSTR("A/B"),      1,        0, 0,     0,    1); 
@@ -103,6 +103,7 @@ void initConfig() {
   ic(C_ACCELERATION, PSTR("Acceleration"), PSTR("mm/s²"),    STEPS_MM, 0, 5,     50,   10000);
   
   if (eeprom_read_dword(0) != EEPROM_MAGIC) {
+    L("Loading defaults\n");
     for (ConfigId i=0 ; i<CONFIGS_USED ; i++) {
       ConfigParam* cp = getConfigParam(i);
       cp->value = displayToValue(cp, cp->def);

@@ -132,7 +132,7 @@ and are stored in EEPROM for persistence.
 | Index | Parameter           |     type | unit  | quantum   | Editor |
 |-------|---------------------|----------|-------|-----------|--------|
 |     0 | Gearing    	      | uint32_t |       | steps/mm  |    int |
-|     1 | Blade width  	      | uint32_t |   mm  | step size |  fixed |
+|     1 | Kerf  	      | uint32_t |   mm  | step size |  fixed |
 |     2 | Space/Finger size   | uint32_t |   mm  | step size |  fixed |
 |     3 | Offset of home      | uint32_t |   mm  | step size |  fixed |
 |     4 | A/B board           | uint8_t  |       | 1         |   enum |
@@ -165,16 +165,16 @@ and I'm using a Trapezoidal lead screw with a pich of 2mm/rev (tr8*2), so I get 
 Note that changing the gearing changes almost all other settings, because they are stored in steps,
 so if you change this setting all other settings must be re-done.
 
-=== Blade width (mm)
+=== Kerf (mm)
 
-The blade width is nominally the width of the blade, but due to inaccuracies that compound,
+The kerf is nominally the width of the blade, but due to the inaccuracies that compound in any mechanical system,
 the actual kerf ends up being larger than this, so while you might start out by setting the
 blade width to the measured width of the teeth of the blade, you might find that the joints
 end up being too loose.
 
-Adjusting the blade is done by cutting a joint and if the joint is too:
-* Loose: Increase blade width.
-* Tight: Decrease blade width.
+Adjusting the kerf is done by cutting a joint and if the joint is too:
+* Loose: Increase kerf.
+* Tight: Decrease kerf.
 
 === Space/Finger size (mm)
 

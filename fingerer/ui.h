@@ -17,4 +17,6 @@ void uiSetScreen(UIScreen screen);
 void uiStartSetup();
 void uiStartEdit(ConfigId id);
 
+extern uint8_t yHome;
+extern uint8_t stop;
 
