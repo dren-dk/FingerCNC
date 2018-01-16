@@ -62,3 +62,7 @@ uint32_t displayToValue(ConfigParam* cp, uint32_t dv);
 uint32_t valueToDisplay(ConfigParam* cp, uint32_t v);
 uint32_t pow10(uint8_t power);
 void storeConfig(ConfigParam *cp);
+
+void cpValueToTrimmed(ConfigParam *cp, char *target);
+void cpValueToUnTrimmed(ConfigParam *cp, char *target);
+void cpValueToString(ConfigParam *cp, char *target, uint8_t trim);

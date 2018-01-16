@@ -1,5 +1,7 @@
 #include <avr/pgmspace.h>
 #include <avr/eeprom.h>
+#include <string.h>
+#include <stdio.h>
 
 #include "uart.h"
 #include "config.h"
@@ -24,6 +26,65 @@ uint32_t pow10(uint8_t power) {
   }
   return r;
 }
+
+void cpValueToTrimmed(ConfigParam *cp, char *target) {
+  cpValueToString(cp, target, 1);
+}
+
+void cpValueToUnTrimmed(ConfigParam *cp, char *target) {
+  cpValueToString(cp, target, 0);
+}
+
+void cpValueToString(ConfigParam *cp, char *target, uint8_t trim) {
+  //P("\n\nConverting %S\n", cp->name);
+  
+  uint32_t v = valueToDisplay(cp, cp->value);
+  sprintf(target, "%lu", v);
+  uint8_t digits = strlen(target);  
+
+  //P("\tConverted int %d to string %s\n", v, target);
+
+  if (cp->decimals) {
+    // Add the decimal point, but first make room for it by pushing the digits before the dot
+    uint8_t dp = digits-cp->decimals;
+    //P("\tdigits=%d dp=%d\n", digits, dp);
+    
+    for (int i=digits;i>=dp;i--) {
+      target[i] = target[i-1];
+    }
+    //P("\tMade room %s\n", target);
+    target[dp] = '.';
+    digits++;
+    //P("\tAdded decimal point at %d decimals=%s\n", cp->decimals, target);
+
+    if (trim) {
+      uint8_t lastDigit = digits-1;
+      while (1) {
+        char ch = target[lastDigit];
+        if (ch == '0' || ch == '.') {
+          digits=lastDigit;
+          target[lastDigit--] = 0;
+        } else {
+          break;
+        }
+      }
+    }
+
+ //   P("\ts=%s len=%d\n", target, digits);
+    
+    // Add leading zero, if needed:
+    if (target[0] == '.') {
+      for (int i=digits ; i>0 ; i--) {
+        target[i] = target[i-1];
+      }
+      target[++digits] = 0;
+      target[0] = '0';
+    }
+    
+  }  
+  //P("\tresult=%s\n\n", target);
+}
+
 
 uint32_t displayToValue(ConfigParam* cp, uint32_t dv) {
   if (cp->divisor) {
@@ -114,6 +175,8 @@ void initConfig() {
   
   for (ConfigId i=0 ; i<CONFIGS_USED ; i++) {
     ConfigParam* cp = getConfigParam(i);
-    P("%S\t%ld\t%S\n", cp->name, valueToDisplay(cp, cp->value), cp->unit);
+    char tmp[10];
+    cpValueToTrimmed(cp, tmp);
+    P("%S\t%s\t%S\n", cp->name, tmp, cp->unit);
   }
 }
