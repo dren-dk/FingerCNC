@@ -59,8 +59,8 @@ void uiUpdate(Event event) {
 }
 
 void uiInit() {
-//  uiSetScreen(HOME_SCREEN);
-  uiSetScreen(SETUP_SCREEN);
+  uiSetScreen(HOME_SCREEN);
+//  uiSetScreen(SETUP_SCREEN);
 }
 
 void uiHandleEvents() {

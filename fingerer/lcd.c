@@ -17,6 +17,43 @@
 
 */
 
+u8g2_uint_t drawCenteredText(uint8_t cx, uint8_t y, uint8_t highlight, char const *str) { 
+  u8g2_SetFont(&u8g2, u8g2_font_6x12_te);
+  u8g2_uint_t width = u8g2_GetStrWidth(&u8g2, str)+2;
+  uint8_t x = cx-width/2;
+  
+  u8g2_SetDrawColor(&u8g2, 1);
+  if (highlight) {
+    u8g2_DrawRBox(&u8g2, x, y, width, 11, 0);
+    u8g2_SetDrawColor(&u8g2, 0);
+  }
+
+  u8g2_DrawStr(&u8g2, x+1, y+11-3, str);
+  return width;
+} 
+
+u8g2_uint_t drawText(uint8_t x, uint8_t y, uint8_t highlight, char const *str) { 
+  u8g2_SetFont(&u8g2, u8g2_font_6x12_te);
+  u8g2_uint_t width = u8g2_GetStrWidth(&u8g2, str)+2;
+  
+  u8g2_SetDrawColor(&u8g2, 1);
+  if (highlight) {
+    u8g2_DrawRBox(&u8g2, x, y, width, 11, 0);
+    u8g2_SetDrawColor(&u8g2, 0);
+  }
+
+  u8g2_DrawStr(&u8g2, x+1, y+11-3, str);
+
+  return width;
+} 
+
+u8g2_uint_t drawTextP(uint8_t x, uint8_t y, uint8_t highlight, char const *str) { 
+    char tmp[50];
+    strcpy_P(tmp, str);
+    return drawText(x,y,highlight,tmp);
+}
+
+
 // This is the hardware "driver" that connects the u8g2 library to the actual hardware needed
 uint8_t u8x8_gpio_and_delay(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
     switch(msg) {

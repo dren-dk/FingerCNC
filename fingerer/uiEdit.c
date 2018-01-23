@@ -27,20 +27,6 @@ void uiStartEdit(ConfigId id) {
   uiSetScreen(EDIT_SCREEN);
 }
 
-void drawCenteredText(uint8_t cx, uint8_t y, uint8_t highlight, char *str) { 
-  u8g2_SetFont(&u8g2, u8g2_font_6x12_te);
-  u8g2_uint_t width = u8g2_GetStrWidth(&u8g2, str)+2;
-  uint8_t x = cx-width/2;
-  
-  u8g2_SetDrawColor(&u8g2, 1);
-  if (highlight) {
-    u8g2_DrawRBox(&u8g2, x, y, width, 11, 0);
-    u8g2_SetDrawColor(&u8g2, 0);
-  }
-
-  u8g2_DrawStr(&u8g2, x+1, y+11-3, str);
-} 
-
 void drawTitle() {
   char tmp[20];
   sprintf_P(tmp, PSTR("%S (%S)"), cp->name, cp->unit);

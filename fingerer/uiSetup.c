@@ -49,7 +49,11 @@ void uiUpdateSetup(Event event) {
   setEncoderPosition(setupCurrent = encPos);
 
   if (event == (EVENT_ENC_BTN | EVENT_ACTIVE)) {
-    uiStartEdit(setupCurrent-1);
+    if (setupCurrent == 0) {
+      uiSetScreen(CUT_SCREEN);
+    } else {    
+      uiStartEdit(setupCurrent-1);
+    }
     return;
   }
 

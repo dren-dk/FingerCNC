@@ -125,6 +125,7 @@ uint8_t handleHoming(uint8_t atMin, uint8_t atMax) {
       motorStartMove(stepsPerMm*600, minSpeed);
       return 1;
     }
+    
   } else if (homed == 2) {
     // Going in the positive direction, expecting to get off xmin
     

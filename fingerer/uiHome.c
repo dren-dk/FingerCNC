@@ -21,6 +21,7 @@ void uiUpdateHome(Event event) {
   }
 
   u8g2_ClearBuffer(&u8g2);
+  u8g2_SetDrawColor(&u8g2, 1); // Switch to off for the text       
   u8g2_DrawXBMP(&u8g2, 0, 0, LOGO_WIDTH, LOGO_HEIGHT, LOGO);
 
   u8g2_SetFont(&u8g2, u8g2_font_6x12_te);
