@@ -14,8 +14,9 @@ typedef enum {
 } UIScreen;
 
 void uiSetScreen(UIScreen screen);
-void uiStartSetup();
-void uiStartEdit(ConfigId id);
+void uiStartSetup(UIScreen screenAfterSetupIsDone);
+void uiReturnToSetup();
+void uiStartEdit(ConfigId id, UIScreen screenToReturnToAfterEdit);
 
 extern uint8_t yHome;
 extern uint8_t stop;

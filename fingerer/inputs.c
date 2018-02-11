@@ -101,11 +101,11 @@ ISR(TIMER0_COMPA_vect) {
 }
 
 uint8_t readXMin() {
-  return !(PINE & _BV(PE5));
+  return PINE & _BV(PE5);
 }
 
 uint8_t readXMax() {
-  return !(PINE & _BV(PE4));
+  return PINE & _BV(PE4);
 }
 
 uint8_t readYMin() {
@@ -114,15 +114,15 @@ uint8_t readYMin() {
 
 void inputsInit() {
   // Ensure that all the inputs are inputs.
-  DDRC &=~ _BV(PC2)|_BV(PC4)|_BV(PC6);
-  DDRE &=~ _BV(PE5)|_BV(PE4);
+  DDRC &=~ (_BV(PC2)|_BV(PC4)|_BV(PC6));
+  DDRE &=~ (_BV(PE5)|_BV(PE4));
   DDRG &=~ _BV(PG0);
   DDRJ &=~ _BV(PJ1);
 
   // And that pullups are enabled
   PORTC |= _BV(PC2)|_BV(PC4)|_BV(PC6);
   PORTG |= _BV(PG0);
-  PORTE |= _BV(PE5) | _BV(PE4);
+  //PORTE |= _BV(PE5) | _BV(PE4);
 
   // Set up timer 0 to poll inputs
   TCNT0 = 0;

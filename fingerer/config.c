@@ -55,6 +55,7 @@ void cpValueToString(ConfigParam *cp, char *target, uint8_t trim) {
     //P("\tMade room %s\n", target);
     target[dp] = '.';
     digits++;
+    target[digits] = 0;
     //P("\tAdded decimal point at %d decimals=%s\n", cp->decimals, target);
 
     if (trim) {
@@ -64,6 +65,9 @@ void cpValueToString(ConfigParam *cp, char *target, uint8_t trim) {
         if (ch == '0' || ch == '.') {
           digits=lastDigit;
           target[lastDigit--] = 0;
+          if (ch == '.') {
+            break;
+          }
         } else {
           break;
         }
@@ -161,7 +165,7 @@ void initConfig() {
   ic(C_STRIDE,       PSTR("Stride"),       PSTR("%"),        1,        0, 50,    5,    95);
   ic(C_MIN_SPEED,    PSTR("Min Speed"),    MMPS,             STEPS_MM, 2, 1250,  100,  50000);
   ic(C_SPEED,        PSTR("Speed"),        MMPS,             STEPS_MM, 2, 1250,  100,  50000);
-  ic(C_ACCELERATION, PSTR("Acceleration"), PSTR("mm/s²"),    STEPS_MM, 0, 5,     50,   10000);
+  ic(C_ACCELERATION, PSTR("Acceleration"), PSTR("mm/s2"),    STEPS_MM, 0, 50,     5,   10000);
   
   if (eeprom_read_dword(0) != EEPROM_MAGIC) {
     L("Loading defaults\n");

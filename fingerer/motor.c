@@ -1,6 +1,7 @@
 #include <avr/pgmspace.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <util/atomic.h>
 
 #include <stdio.h>
 
@@ -8,6 +9,7 @@
 #include "uart.h"
 #include "inputs.h"
 #include "events.h"
+#include "config.h"
 
 /*
 | Function  | AVR | Arduino | AKA.    | int     |
@@ -39,6 +41,9 @@ uint8_t ticks;
 
 uint8_t homed;
 
+uint8_t asapPending =0;
+uint32_t asapTargetPosition;
+
 void motorStartMove(int32_t targetPosition, int32_t speed);
 
 uint8_t xHomed() {
@@ -54,15 +59,20 @@ void motorInit() {
   DDRF |= _BV(PF0);
   DDRF |= _BV(PF1);
 
+  asapPending =0;
+  stepsPerMm = getConfigValue(C_STEPS_PER_MM);
+  accelerationPerTick = getConfigValue(C_ACCELERATION) / 1000;
+  if (accelerationPerTick <= 0) {
+    accelerationPerTick = 1;
+  }
+  maxSpeed = getConfigValue(C_SPEED);
+  minSpeed = getConfigValue(C_MIN_SPEED);
+  
   currentPosition = 0;
   moving = 0;
 
   // TODO: Get these from the configuration
-  accelerationPerTick = 10;
-  maxSpeed = 2500;
-  minSpeed = 250;
-  stepsPerMm = 200*2/2; // (full steps) * (microstepping) / (pitch)
-  xAxisLength = 600;
+  xAxisLength = 2000;
 
   enableXMotor(0);
 
@@ -86,7 +96,13 @@ void setTimerSpeed() {
 void stopMove() {
   TCCR1B &=~ _BV(CS10);  // Disable timer interrupt.
   moving = 0;
+
   addEvent(EVENT_RUNNING);
+  
+  if (asapPending) {
+    asapPending = 0;
+    motorStartMove(asapTargetPosition, maxSpeed);
+  }
 }
 
 void enableXMotor(uint8_t enabled) {
@@ -172,11 +188,10 @@ ISR(TIMER1_COMPA_vect) {
     }
   }
 
-  // Send a step pulse
-  step();
-
   // Count down the distances
   if (accelerateDistance) {
+    step();
+    
     accelerateDistance--;
     if (ticks) {
       currentSpeed += ticks*accelerationPerTick;
@@ -187,10 +202,14 @@ ISR(TIMER1_COMPA_vect) {
       setTimerSpeed();
     }
   } else if (plateauDistance) {
+    step();
+    
     if (!--plateauDistance) {
       ticks = 0; // The last plateau step, reset ticks to start breaking correctly
     }
   } else if (decelerateDistance) {
+    step();
+    
     if (ticks) {
       currentSpeed -= ticks*accelerationPerTick;
       ticks = 0;
@@ -228,7 +247,7 @@ int32_t estimateAccelerationDistance(int32_t initialrate,
 
   int32_t time = (targetrate-initialrate)/accelerationPerTick;
   // Acceleration is in steps / ms² -> time is in ms
-  //  P("ead: ir=%ld tr=%ld a=%ld t=%ld\n", initialrate, targetrate, acceleration, time);
+   P("ead: ir=%ld tr=%ld a=%ld t=%ld\n", initialrate, targetrate, acceleration, time);
   return (initialrate*time)/1000 + acceleration*(time*time)/2000;
 }
 
@@ -282,6 +301,10 @@ void motorStartMove(int32_t targetPosition, int32_t speed) {
   } else {
     length = targetPosition-currentPosition;
   }
+  
+  if (!length) {
+    return;
+  }
 
   currentDirection = length > 0 ? 1 : -1;
   
@@ -305,12 +328,14 @@ void motorStartMove(int32_t targetPosition, int32_t speed) {
 						    speed,
 						    accelerationPerTick);
   
-  decelerateDistance = estimateAccelerationDistance(maxSpeed,
-						    speed,
-						    -accelerationPerTick);
+  decelerateDistance = -estimateAccelerationDistance(speed,
+						    minSpeed,
+						    accelerationPerTick);
+  
   P("Moving from %ld to %ld len=%ld dir=%d ad=%ld dd=%ld\r\n",
     currentPosition, targetPosition, length, currentDirection,
-    accelerateDistance, decelerateDistance);
+    accelerateDistance, decelerateDistance    
+   );
   
   if (accelerateDistance < 0) {
     accelerateDistance = 0;
@@ -359,7 +384,7 @@ void motorHome() {
   homed = 0;
   currentPosition = 0;
   motorStartMove(2*stepsPerMm, maxSpeed);
-  while (moving) {
+  while (motorMoving()) {
   }
   homed=1;
   motorStartMove(-1, maxSpeed);
@@ -368,3 +393,23 @@ void motorHome() {
 uint8_t motorMoving() {
   return moving;
 }
+
+void motorToAsap(uint32_t targetPosition) {
+  ATOMIC_BLOCK(ATOMIC_FORCEON) {
+    if (targetPosition == 0xffffffff) {
+      asapPending = 0;
+    } else {
+      if (moving) {
+          if (asapTargetPosition != targetPosition) {
+            asapTargetPosition = targetPosition;
+            asapPending = 1;
+          }
+      } else {
+        asapPending = 0;
+        motorStartMove(targetPosition, maxSpeed);
+      }  
+    }
+  }
+}
+
+

@@ -8,17 +8,22 @@
 #include "config.h"
 #include "inputs.h"
 
-const uint8_t MAX_CHARS = 20;
+const uint8_t MAX_CHARS = 30;
 const uint8_t MAX_LINES = 6;
 const uint8_t LINE_HEIGHT = 11;
 
 uint8_t setupTop = 0;
 uint8_t setupCurrent = 0;
+UIScreen screenAfterSetup;
 
-void uiStartSetup() {
-  L("Starting Setup\n");
+void uiReturnToSetup() {
   setEncoderPosition(setupCurrent);
   uiSetScreen(SETUP_SCREEN);
+}
+
+void uiStartSetup(UIScreen screenAfterSetupIsDone) {
+  screenAfterSetup = screenAfterSetupIsDone;
+  uiReturnToSetup();
 }
 
 void drawOption(uint8_t index, uint8_t y) {
@@ -33,26 +38,27 @@ void drawOption(uint8_t index, uint8_t y) {
     strcpy_P(tmp, PSTR("Exit"));
   } else {
     ConfigParam* cp = getConfigParam(index-1);
-    sprintf_P(tmp, PSTR("%S (%S)"), cp->name, cp->unit);    
+    sprintf_P(tmp, PSTR("%S (%S)"), cp->name, cp->unit);
   }
   
   u8g2_DrawStr(&u8g2, 2, y+LINE_HEIGHT-3, tmp);
+  P("draw: %d %s\n", index, tmp);
 }
 
 void uiUpdateSetup(Event event) {
   int16_t encPos = getEncoderPosition();
   if (encPos < 0) {
-    encPos = CONFIGS_USED-1;
-  } else if (encPos > CONFIGS_USED-1) {
+    encPos = CONFIGS_USED;
+  } else if (encPos > CONFIGS_USED) {
     encPos = 0;
   }
   setEncoderPosition(setupCurrent = encPos);
 
   if (event == (EVENT_ENC_BTN | EVENT_ACTIVE)) {
     if (setupCurrent == 0) {
-      uiSetScreen(CUT_SCREEN);
+      uiSetScreen(screenAfterSetup);
     } else {    
-      uiStartEdit(setupCurrent-1);
+      uiStartEdit(setupCurrent-1, SETUP_SCREEN);
     }
     return;
   }
@@ -77,4 +83,5 @@ void uiUpdateSetup(Event event) {
   }  
 
   u8g2_SendBuffer(&u8g2);  
+  L("Sent buffer\n");
 }

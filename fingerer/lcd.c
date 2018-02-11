@@ -17,40 +17,36 @@
 
 */
 
-u8g2_uint_t drawCenteredText(uint8_t cx, uint8_t y, uint8_t highlight, char const *str) { 
-  u8g2_SetFont(&u8g2, u8g2_font_6x12_te);
-  u8g2_uint_t width = u8g2_GetStrWidth(&u8g2, str)+2;
-  uint8_t x = cx-width/2;
+const uint8_t AIR = 2;
+
+u8g2_uint_t drawText(uint8_t x, uint8_t y, uint8_t style, char const *str) { 
+  int8_t ascent = u8g2_GetAscent(&u8g2);
+  int8_t descent = u8g2_GetDescent(&u8g2);
+  int8_t height = ascent-descent + 2*AIR;
+  
+  u8g2_uint_t width = u8g2_GetStrWidth(&u8g2, str)+2*AIR;
+  
+  if (style & TS_CENTER) {
+    x -= width/2;    
+  }
   
   u8g2_SetDrawColor(&u8g2, 1);
-  if (highlight) {
-    u8g2_DrawRBox(&u8g2, x, y, width, 11, 0);
+  if (style & TS_INVERT) {
+    u8g2_DrawRBox(&u8g2, x, y, width, height, 0);
     u8g2_SetDrawColor(&u8g2, 0);
+  } else if (style & TS_FRAME) {
+    u8g2_DrawRFrame(&u8g2, x, y, width, height, 0);    
   }
 
-  u8g2_DrawStr(&u8g2, x+1, y+11-3, str);
-  return width;
-} 
-
-u8g2_uint_t drawText(uint8_t x, uint8_t y, uint8_t highlight, char const *str) { 
-  u8g2_SetFont(&u8g2, u8g2_font_6x12_te);
-  u8g2_uint_t width = u8g2_GetStrWidth(&u8g2, str)+2;
-  
-  u8g2_SetDrawColor(&u8g2, 1);
-  if (highlight) {
-    u8g2_DrawRBox(&u8g2, x, y, width, 11, 0);
-    u8g2_SetDrawColor(&u8g2, 0);
-  }
-
-  u8g2_DrawStr(&u8g2, x+1, y+11-3, str);
+  u8g2_DrawStr(&u8g2, x+AIR, y+ascent+AIR, str);
 
   return width;
 } 
 
-u8g2_uint_t drawTextP(uint8_t x, uint8_t y, uint8_t highlight, char const *str) { 
+u8g2_uint_t drawTextP(uint8_t x, uint8_t y, uint8_t style, char const *str) { 
     char tmp[50];
     strcpy_P(tmp, str);
-    return drawText(x,y,highlight,tmp);
+    return drawText(x,y,style,tmp);
 }
 
 

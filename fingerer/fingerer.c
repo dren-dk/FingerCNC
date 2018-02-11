@@ -1,22 +1,3 @@
-/*
-#include <ctype.h>
-#include <inttypes.h>
-
-#include <string.h>
-#include <stdlib.h>
-#include <stdint.h>
-
-#include <avr/io.h>
-#include <util/delay.h>
-#include <avr/pgmspace.h>
-#include <avr/sleep.h>
-
-#include <avr/interrupt.h>
-#include <avr/eeprom.h> 
-#include <avr/pgmspace.h>
-#include <avr/eeprom.h> 
-*/
-
 #include <avr/wdt.h> 
 #include <stdio.h>
 
@@ -44,7 +25,6 @@ int main(void) {
 
   setLed(0);
   L("Ready\n");
-
   
   while (1) {
     uiHandleEvents();

@@ -18,8 +18,11 @@ const uint8_t DIGIT_WIDTH = 16;
 uint8_t editDigit; 
 ConfigParam* cp;
 
-void uiStartEdit(ConfigId id) {
+UIScreen screenAfterEdit;
+
+void uiStartEdit(ConfigId id, UIScreen screenToReturnToAfterEdit) {
   editConfigId = id;
+  screenAfterEdit = screenToReturnToAfterEdit;
   cp = getConfigParam(id);
   editDigit = 0xff;
   setEncoderPosition(1);
@@ -28,9 +31,10 @@ void uiStartEdit(ConfigId id) {
 }
 
 void drawTitle() {
-  char tmp[20];
+  char tmp[30];
   sprintf_P(tmp, PSTR("%S (%S)"), cp->name, cp->unit);
-  drawCenteredText(64, 7, 0, tmp);
+  u8g2_SetFont(&u8g2, u8g2_font_6x12_te);  
+  drawText(63, 7, TS_CENTER, tmp);
 }
 
 uint32_t min;
@@ -126,7 +130,11 @@ void handleEditing(Event event) {
       editDigit = 0xff;
 
       if (event == (EVENT_ENC_BTN | EVENT_ACTIVE)) {
-	uiStartSetup();
+        if (screenAfterEdit == SETUP_SCREEN) {
+          uiReturnToSetup();
+        } else {
+          uiSetScreen(screenAfterEdit);          
+        }
 	return;
       }
     }
@@ -164,7 +172,8 @@ void handleEditing(Event event) {
 
   if (!editing) {
     // Add the exit button
-    drawCenteredText(64, 52, editDigit==0xff, "Exit");
+    u8g2_SetFont(&u8g2, u8g2_font_6x12_te);  
+    drawText(64, 52, editDigit==0xff ? TS_INVERT|TS_CENTER : TS_CENTER, "Exit");
   }
 }
 

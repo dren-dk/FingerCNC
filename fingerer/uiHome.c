@@ -13,9 +13,18 @@
 
 
 void uiUpdateHome(Event event) {
+  if (event == EVENT_NONE) {
+    setEncoderPosition(0);
+  }
+  uint32_t pos = getEncoderPosition();
+  
   if (event == (EVENT_ENC_BTN|EVENT_ACTIVE)) {
     if (yHome) {
-      uiSetScreen(HOMING_SCREEN);
+      if (pos & 1) {
+        uiSetScreen(SETUP_SCREEN);
+      } else {
+        uiSetScreen(HOMING_SCREEN);
+      }
       return;
     }
   }
@@ -29,7 +38,11 @@ void uiUpdateHome(Event event) {
   if (stop) {
     u8g2_DrawStr(&u8g2, 1, 60, "Release STOP");
   } else if (yHome) {
-    u8g2_DrawStr(&u8g2, 1, 60, "Press button to home");
+    if (pos & 1) {
+      u8g2_DrawStr(&u8g2, 1, 60, "Press for config");
+    } else {
+      u8g2_DrawStr(&u8g2, 1, 60, "Press button to home");
+    }
   } else {
     u8g2_DrawStr(&u8g2, 1, 60, "Move sled home");
   }

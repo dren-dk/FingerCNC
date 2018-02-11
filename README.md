@@ -96,7 +96,7 @@ The first cut on board B is the left edge of space 1.
   |                        Board B                            |
   |                                                           |
   |                                                           |
-```
+<!-- <!-- <!-- ``` --> --> -->
 
 
 ## Menu structure
