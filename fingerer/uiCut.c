@@ -13,22 +13,11 @@
 #include "motor.h"
 #include "fingerjoints.h"
 
-
-/*
-Finger size: 12.123 mm
-A/B Hole
-Status
-Config
-*/
-
 uint8_t armed = 0;
 int8_t cutOpt = 0;
-int32_t pos = 0;
 uint8_t editingSlot = 0;
-uint32_t homePos = 0;
 
 ConfigParam* fingerWidth;
-
 FingerJoints fj;
 
 void initFingerJointsFromConfig() {
@@ -40,14 +29,13 @@ void initFingerJointsFromConfig() {
 void uiCut(Event event) {
   static uint8_t moveArmed = 0;
 
-  if (event == (EVENT_X_AT_MIN | EVENT_ACTIVE)) {
-    moveArmed = 0;
-    pos = 0;
-  }
-
+  if (event == (EVENT_ACTIVE|EVENT_ENC_BTN)) {
+    armed = 0;
+  }  
+  
   if (moveArmed && yHome && !motorMoving()) {
-    pos += 2000;    
-    motorMoveTo(pos);
+    fingerAvance(&fj);
+    motorToAsap(fj.currentPos);
     moveArmed = 0;
   }
 
