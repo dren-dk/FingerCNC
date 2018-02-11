@@ -144,8 +144,14 @@ void uiUpdateCut(Event event) {
             armed ? PSTR("Armed") : PSTR("Arm"));
   drawTextP(32+63, 1+11*2, TS_CENTER | (cutOpt==4 ? TS_FRAME : 0), 
             PSTR("Config"));
-  
-  // Fourth line: Status
+
+  if (armed) {
+    sprintf_P(tmp, PSTR("cut %hhu/%hhu"), fj.currentCut+1, fj.cutsPerSlot);
+    if (fj.cutsPerSlot < 10) {
+      u8g2_SetFont(&u8g2, u8g2_font_courB18_tf);
+    }
+    drawText(63, 4+11*3, TS_CENTER, tmp);              
+  }  
   
   u8g2_SendBuffer(&u8g2);  
 }
