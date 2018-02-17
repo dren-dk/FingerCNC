@@ -6,6 +6,8 @@
 #include "events.h"
 #include "motor.h"
 
+#include "board.h"
+
 /*
 | Function  | AVR | Arduino | AKA.    | int     |
 |-----------|-----|---------|---------|---------|
@@ -109,7 +111,7 @@ uint8_t readXMax() {
 }
 
 uint8_t readYMin() {
-  return PINJ & _BV(PJ1);
+  return !(PINJ & _BV(PJ1)); // Anders
 }
 
 void inputsInit() {
@@ -122,8 +124,10 @@ void inputsInit() {
   // And that pullups are enabled
   PORTC |= _BV(PC2)|_BV(PC4)|_BV(PC6);
   PORTG |= _BV(PG0);
-  //PORTE |= _BV(PE5) | _BV(PE4);
+  PORTE |= _BV(PE5) | _BV(PE4);
 
+  PORTJ |= _BV(PJ1); // Pullup for Anders
+  
   // Set up timer 0 to poll inputs
   TCNT0 = 0;
   OCR0A = 15; // 16 -> ~1 ms between interrupts @ 16 MHz

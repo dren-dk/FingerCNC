@@ -93,3 +93,7 @@ fuses8int3v:
 
 clean :
 	rm -f $(PROJ).hex $(PROJ).elf $(PROJ).map $(OBJS) $(INTERMEDIATE)
+
+#$(FW)/avr8gpio.h: $(FW)/gen-gpio
+#	$(FW)/gen-gpio
+	

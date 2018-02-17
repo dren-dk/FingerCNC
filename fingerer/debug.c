@@ -1,7 +1,9 @@
 #include <avr/io.h>
 
 #include "debug.h"
-#include "gpio.h"
+//#include "gpio.h"
+
+#include "avr8gpio.h"
 
 /*
 This is just a simple way of twiddling some ports that can be hooked up to
@@ -13,24 +15,39 @@ a logic analyzer, for timing stuff.
 | LED       | PB7 | D13     | LED     |         |
 */
 
+#define DEBUG_0 GPG5
+#define DEBUG_1 GPE3
+#define DEBUG_2 GPH3
+#define LED     GPB7
+
+
 void initDebug() {
+  GPOUTPUT(DEBUG_0);
+  GPOUTPUT(DEBUG_1);
+  GPOUTPUT(DEBUG_2);
+  GPOUTPUT(LED);
+/*
   DDRG |= _BV(PG5);
   DDRE |= _BV(PE3);
   DDRH |= _BV(PH3);
   DDRB |= _BV(PB7);
+  */
   setDebug(0);
 }
 
 void setDebug0(uint8_t on) {
-  GPIO(G, 5, on);
+  //GPIO(G, 5, on);
+  GPWRITE(DEBUG_0, on);
 }
 
 void setDebug1(uint8_t on) {
-  GPIO(E, 3, on);
+//  GPIO(E, 3, on);
+  GPWRITE(DEBUG_1, on);
 }
 
 void setDebug2(uint8_t on) {
-  GPIO(H, 3, on);
+//  GPIO(H, 3, on);
+  GPWRITE(DEBUG_2, on);
 }
 
 void setDebug(uint8_t debug) {
@@ -40,6 +57,7 @@ void setDebug(uint8_t debug) {
 }
 
 void setLed(uint8_t on) {
-  GPIO(B, 7, on);
+//  GPIO(B, 7, on);
+  GPWRITE(LED, on);
 }
 
