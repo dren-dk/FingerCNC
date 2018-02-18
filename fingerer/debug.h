@@ -1,5 +1,7 @@
 #pragma once
 
+#include <inttypes.h>
+
 void initDebug();
 void setDebug(uint8_t debug);
 void setDebug0(uint8_t on);

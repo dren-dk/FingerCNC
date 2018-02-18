@@ -37,27 +37,31 @@ Reference: https://www.arduino.cc/en/Hacking/PinMapping2560
 
 The AKA. column refers to the name of the signal on the smart adaptor or the RAMPS connector
 
-| Function  | AVR | Arduino | AKA.    | int     |
-|-----------|-----|---------|---------|---------|
-| LED       | PB7 | D13     |         |         |
-| X-enable  | PD7 | D38     |         |         |
-| X-step    | PF0 | A0      |         |         |
-| X-dir     | PF1 | A1      |         |         |
-| LCD-CS    | PH1 | D16     | EXP1-4  |         |
-| LCD-Data  | PH0 | D17     | EXP1-3  |         |
-| LCD-Clock | PA1 | D23     | EXP1-5  |         |
-| WS2812    | PB5 | D11     | Servo 1 |         |
-| Beeper    | PC0 | D37     | EXP1-1  |         |
-| X-Min     | PE5 | D3      |         | INT 5   |
-| X-Max     | PE4 | D2      |         | INT 4   |
-| Y-Min     | PJ1 | D14     |         | PCI 10  |
-| Enc-btn   | PC2 | D35     | EXP1-2  |         |
-| Enc-a     | PC6 | D31     | EXP2-3  |         |
-| Enc-b     | PC4 | D33     | EXP2-5  |         |
-| Stop      | PG0 | D41     | EXP2-8  |         |
-| Debug 0   | PG5 | D4      | Servo 4 |         |
-| Debug 1   | PE3 | D5      | Servo 3 |         |
-| Debug 2   | PH3 | D6      | Servo 2 |         |
+The define column refers to the constants defined in the board.h file these are then used throughout the code in stead of
+refering directly to the pin names, this way it's possible to port the code to other boards without going through every single
+source file looking for GPIO references.
+
+| Function  | Define         | AVR | Arduino | AKA.    |
+|-----------|----------------|-----|---------|---------|
+| LED       | LED            | PB7 | D13     |         |
+| X-enable  | MOTOR_X_ENABLE | PD7 | D38     |         |
+| X-step    | MOTOR_X_STEP   | PF0 | A0      |         |
+| X-dir     | MOTOR_X_DIR    | PF1 | A1      |         |
+| LCD-CS    | LCD_CS         | PH1 | D16     | EXP1-4  |
+| LCD-Data  | LCD_DATA       | PH0 | D17     | EXP1-3  |
+| LCD-Clock | LCD_CLOCK      | PA1 | D23     | EXP1-5  |
+| WS2812    | WS2812         | PB5 | D11     | Servo 1 |
+| Beeper    | BEEPER         | PC0 | D37     | EXP1-1  |
+| X-Min     | LIMIT_X_MIN    | PE5 | D3      |         |
+| X-Max     | LIMIT_X_MAX    | PE4 | D2      |         |
+| Y-Min     | LIMIT_Y_MIN    | PJ1 | D14     |         |
+| Enc-btn   | ENCODER_BUTTON | PC2 | D35     | EXP1-2  |
+| Enc-a     | ENCODER_A      | PC6 | D31     | EXP2-3  |
+| Enc-b     | ENCODER_B      | PC4 | D33     | EXP2-5  |
+| Stop      | STOP           | PG0 | D41     | EXP2-8  |
+| Debug 0   | DEBUG_0        | PG5 | D4      | Servo 4 |
+| Debug 1   | DEBUG_1        | PE3 | D5      | Servo 3 |
+| Debug 2   | DEBUG_2        | PH3 | D6      | Servo 2 |
 
 ## The serial port
 

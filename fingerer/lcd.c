@@ -1,20 +1,17 @@
 #include "lcd.h"
 
-//#include "../u8g2/csrc/u8x8.h"
-
-#include <avr/io.h>
 #include <util/delay_basic.h>
 
-#include "gpio.h"
+#include "board.h"
 #include "debug.h"
 
 /*
  The GPIO pins used for the lcd are:
- 
-| LCD-CS    | PH1 | D16     | EXP1-4  |
-| LCD-Data  | PH0 | D17     | EXP1-3  |
-| LCD-Clock | PA1 | D23     | EXP1-5  |
-
+| Function  | Define         | AVR | Arduino | AKA.    |
+|-----------|----------------|-----|---------|---------|
+| LCD-CS    | LCD_CS         | PH1 | D16     | EXP1-4  |
+| LCD-Data  | LCD_DATA       | PH0 | D17     | EXP1-3  |
+| LCD-Clock | LCD_CLOCK      | PA1 | D23     | EXP1-5  |
 */
 
 const uint8_t AIR = 2;
@@ -54,13 +51,14 @@ u8g2_uint_t drawTextP(uint8_t x, uint8_t y, uint8_t style, char const *str) {
 uint8_t u8x8_gpio_and_delay(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
     switch(msg) {
         case U8X8_MSG_GPIO_AND_DELAY_INIT:
-            DDRH |= _BV(PH0) | _BV(PH1);
-            DDRA |= _BV(PA1);
+          GPOUTPUT(LCD_CS);
+          GPOUTPUT(LCD_DATA);
+          GPOUTPUT(LCD_CLOCK);
         break;
         
-        case U8X8_MSG_GPIO_CS:         GPIO(H, 1, arg_int) break;
-        case U8X8_MSG_GPIO_SPI_DATA:   GPIO(H, 0, arg_int) break;
-        case U8X8_MSG_GPIO_SPI_CLOCK:  GPIO(A, 1, arg_int) break;
+        case U8X8_MSG_GPIO_CS:         GPWRITE(LCD_CS, arg_int); break;
+        case U8X8_MSG_GPIO_SPI_DATA:   GPWRITE(LCD_DATA, arg_int); break;
+        case U8X8_MSG_GPIO_SPI_CLOCK:  GPWRITE(LCD_CLOCK, arg_int); break;
         
         case U8X8_MSG_DELAY_NANO: // When we get here 750 ns has already passed, so there's no point in doing anything 
             break;
@@ -108,8 +106,8 @@ uint8_t u8x8_gpio_and_delay(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *ar
 uint8_t sw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
   if (msg == U8X8_MSG_BYTE_SEND) {
     uint8_t* data = (uint8_t *)arg_ptr;
-    uint8_t clockSet = PORTA;
-    uint8_t clockClear = clockSet & ~_BV(PA1);
+    uint8_t clockSet = GPPORT(LCD_CLOCK);
+    uint8_t clockClear = clockSet & ~ GPBV(LCD_CLOCK);
 
     while (arg_int > 0) {
       uint8_t b = *data;
@@ -117,10 +115,10 @@ uint8_t sw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
       arg_int--;
       uint8_t i = 8;
       do {
-	PORTA = clockClear;
-	GPIO(H, 0, b & 128)
+	GPPORT(LCD_CLOCK) = clockClear;
+	GPWRITE(LCD_DATA, b & 128)
 	b <<= 1;
-	PORTA = clockSet;
+	GPPORT(LCD_CLOCK) = clockSet;
       } while (--i);   
     }
 

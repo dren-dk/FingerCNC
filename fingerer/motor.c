@@ -1,9 +1,10 @@
 #include <avr/pgmspace.h>
-#include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/atomic.h>
 
 #include <stdio.h>
+
+#include "board.h"
 
 #include "motor.h"
 #include "uart.h"
@@ -11,12 +12,13 @@
 #include "events.h"
 #include "config.h"
 
+
 /*
-| Function  | AVR | Arduino | AKA.    | int     |
-|-----------|-----|---------|---------|---------|
-| X-enable  | PD7 | D38     |         |         |
-| X-step    | PF0 | A0      |         |         |
-| X-dir     | PF1 | A1      |         |         |
+| Function  | Define         | AVR | Arduino | AKA.    |
+|-----------|----------------|-----|---------|---------|
+| X-enable  | MOTOR_X_ENABLE | PD7 | D38     |         |
+| X-step    | MOTOR_X_STEP   | PF0 | A0      |         |
+| X-dir     | MOTOR_X_DIR    | PF1 | A1      |         |
 */
 
 
@@ -55,9 +57,9 @@ int32_t motorXPosition() {
 }
 
 void motorInit() {
-  DDRD |= _BV(PD7);
-  DDRF |= _BV(PF0);
-  DDRF |= _BV(PF1);
+  GPOUTPUT(MOTOR_X_ENABLE);
+  GPOUTPUT(MOTOR_X_STEP);
+  GPOUTPUT(MOTOR_X_DIR);
 
   asapPending =0;
   stepsPerMm = getConfigValue(C_STEPS_PER_MM);
@@ -106,11 +108,8 @@ void stopMove() {
 }
 
 void enableXMotor(uint8_t enabled) {
-  if (enabled) {
-    PORTD &=~ _BV(PD7);    
-  } else {
-    stopMove();
-    PORTD |= _BV(PD7);
+  GPWRITE(MOTOR_X_ENABLE, enabled);
+  if (!enabled) {
     homed=0;
   }
 }
@@ -118,9 +117,9 @@ void enableXMotor(uint8_t enabled) {
 void step() {
   // This ordering lengthens the pulse a little, which might not be needed,
   // but it's probably not a bad idea
-  PORTF |= _BV(PF0);
+  GPSET(MOTOR_X_STEP);
   currentPosition += currentDirection;
-  PORTF &=~ _BV(PF0);
+  GPCLEAR(MOTOR_X_STEP);
 }
 
 uint8_t handleHoming(uint8_t atMin, uint8_t atMax) {
@@ -308,11 +307,11 @@ void motorStartMove(int32_t targetPosition, int32_t speed) {
 
   currentDirection = length > 0 ? 1 : -1;
   
-  // Set the direction bit. and ensure that length is positive
+  // Set the direction bit. and ensure that length is positive  
   if (length > 0) {
-    PORTF |= _BV(PF1);
+    GPSET(MOTOR_X_DIR);
   } else {
-    PORTF &=~ _BV(PF1);
+    GPCLEAR(MOTOR_X_DIR);
     length = -length;
   }
 

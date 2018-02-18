@@ -9,15 +9,15 @@
 #include "board.h"
 
 /*
-| Function  | AVR | Arduino | AKA.    | int     |
-|-----------|-----|---------|---------|---------|
-| X-Min     | PE5 | D3      |         | INT 5   |
-| X-Max     | PE4 | D2      |         | INT 4   |
-| Y-Min     | PJ1 | D14     |         | PCI 10  |
-| Enc-btn   | PC2 | D35     | EXP1-2  |         |
-| Enc-a     | PC6 | D31     | EXP2-3  |         |
-| Enc-b     | PC4 | D33     | EXP2-5  |         |
-| Stop      | PG0 | D41     | EXP2-8  |         |
+| Function  | Define         | AVR | Arduino | AKA.    |
+|-----------|----------------|-----|---------|---------|
+| X-Min     | LIMIT_X_MIN    | PE5 | D3      |         |
+| X-Max     | LIMIT_X_MAX    | PE4 | D2      |         |
+| Y-Min     | LIMIT_Y_MIN    | PJ1 | D14     |         |
+| Enc-btn   | ENCODER_BUTTON | PC2 | D35     | EXP1-2  |
+| Enc-a     | ENCODER_A      | PC6 | D31     | EXP2-3  |
+| Enc-b     | ENCODER_B      | PC4 | D33     | EXP2-5  |
+| Stop      | STOP           | PG0 | D41     | EXP2-8  |
 
 Ok, so I wanted to have all the inputs trigger interrupts,
 so I could have a nice state machine driven by the inputs
@@ -93,40 +93,66 @@ void updateDebounceCounters(Event event, uint8_t raw) {
 
 ISR(TIMER0_COMPA_vect) {
   motorPoll();
-  updateDebounceCounters(EVENT_ENC_BTN, PINC & _BV(PC2));
-  updateDebounceCounters(EVENT_ENC_A,   PINC & _BV(PC6));
-  updateDebounceCounters(EVENT_ENC_B,   PINC & _BV(PC4));
-  updateDebounceCounters(EVENT_STOP,    PING & _BV(PG0));
+  updateDebounceCounters(EVENT_ENC_BTN, GPREAD(ENCODER_BUTTON));
+  updateDebounceCounters(EVENT_ENC_A,   GPREAD(ENCODER_A));
+  updateDebounceCounters(EVENT_ENC_B,   GPREAD(ENCODER_B));
+  updateDebounceCounters(EVENT_STOP,    GPREAD(STOP));
   updateDebounceCounters(EVENT_X_MIN,   readXMin());
   updateDebounceCounters(EVENT_X_MAX,   readXMax());
   updateDebounceCounters(EVENT_Y_MIN,   readYMin());  
 }
 
 uint8_t readXMin() {
-  return PINE & _BV(PE5);
+  return GPREAD(LIMIT_X_MIN);
 }
 
 uint8_t readXMax() {
-  return PINE & _BV(PE4);
+  return GPREAD(LIMIT_X_MAX);
 }
 
 uint8_t readYMin() {
-  return !(PINJ & _BV(PJ1)); // Anders
+#ifdef INVERT_Y_MIN
+  return !GPREAD(LIMIT_Y_MIN);
+#else
+  return GPREAD(LIMIT_Y_MIN);
+#endif
 }
+
+/*
+| Function  | Define         | AVR | Arduino | AKA.    |
+|-----------|----------------|-----|---------|---------|
+| X-Min     | LIMIT_X_MIN    | PE5 | D3      |         |
+| X-Max     | LIMIT_X_MAX    | PE4 | D2      |         |
+| Y-Min     | LIMIT_Y_MIN    | PJ1 | D14     |         |
+| Enc-btn   | ENCODER_BUTTON | PC2 | D35     | EXP1-2  |
+| Enc-a     | ENCODER_A      | PC6 | D31     | EXP2-3  |
+| Enc-b     | ENCODER_B      | PC4 | D33     | EXP2-5  |
+| Stop      | STOP           | PG0 | D41     | EXP2-8  |
+  
+*/
 
 void inputsInit() {
   // Ensure that all the inputs are inputs.
-  DDRC &=~ (_BV(PC2)|_BV(PC4)|_BV(PC6));
-  DDRE &=~ (_BV(PE5)|_BV(PE4));
-  DDRG &=~ _BV(PG0);
-  DDRJ &=~ _BV(PJ1);
+  GPINPUT(LIMIT_X_MIN);
+  GPINPUT(LIMIT_X_MAX);
+  GPINPUT(LIMIT_Y_MIN);
+  GPINPUT(ENCODER_BUTTON);
+  GPINPUT(ENCODER_A);
+  GPINPUT(ENCODER_B);
+  GPINPUT(STOP);
+  
 
   // And that pullups are enabled
-  PORTC |= _BV(PC2)|_BV(PC4)|_BV(PC6);
-  PORTG |= _BV(PG0);
-  PORTE |= _BV(PE5) | _BV(PE4);
+  GPSET(LIMIT_X_MIN);
+  GPSET(LIMIT_X_MAX);
+  GPSET(ENCODER_BUTTON);
+  GPSET(ENCODER_A);
+  GPSET(ENCODER_B);
+  GPSET(STOP);
 
-  PORTJ |= _BV(PJ1); // Pullup for Anders
+#ifdef PULLUP_Y_MIN
+  GPSET(LIMIT_Y_MIN);
+#endif
   
   // Set up timer 0 to poll inputs
   TCNT0 = 0;

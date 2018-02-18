@@ -1,6 +1,5 @@
 #pragma once
 #include <inttypes.h>
-#include <avr/io.h>
 
 void motorInit();
 void enableXMotor(uint8_t enabled);
