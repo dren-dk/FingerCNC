@@ -20,17 +20,24 @@ uint8_t editingSlot = 0;
 ConfigParam* fingerWidth;
 FingerJoints fj;
 
-void initFingerJointsFromConfig() {
-    initFingerJoints(&fj, fingerWidth->value, getConfigValue(C_BOARD),
+void initFingerJointsForBoard(uint8_t board) {
+  initFingerJoints(&fj, fingerWidth->value, board,
                      getConfigValue(C_SPACE), getConfigValue(C_HOME_OFFSET),
                      getConfigValue(C_BLADE_WIDTH), getConfigValue(C_STRIDE));
 }
+
+void initFingerJointsFromConfig() {
+  initFingerJointsForBoard(getConfigValue(C_BOARD));
+}
+
 
 void uiCut(Event event) {
   static uint8_t moveArmed = 0;
 
   if (event == (EVENT_ACTIVE|EVENT_ENC_BTN)) {
     armed = 0;
+    initFingerJointsForBoard(fj.board ? 0 : 1);
+    motorToAsap(fj.currentPos);
   }  
   
   if (moveArmed && yHome && !motorMoving()) {
@@ -57,6 +64,7 @@ void uiUpdateCut(Event event) {
     setEncoderPosition(0);    
     initFingerJointsFromConfig();
     motorToAsap(fj.currentPos);
+    L("Initialized fingers");
   }
 
   if (armed) {

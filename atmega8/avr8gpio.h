@@ -24,7 +24,7 @@
  * PINA & 1<<PA3           GPREAD(GPA3)
  * 
  * 
- * If the GP macros are used with constants, then the code is exactly the same as the traditional
+ * If the GP macros are used with constants, then the code generated is exactly the same as the traditional
  * way of doing things, but it's also possible to use variable, in which case the there will be a
  * slight penalty of a couple of shitfts and an add and a bitwise and for each read or write.
  * 
@@ -34,34 +34,34 @@
  * 
  */
 
-// Equivalent to PINA, PINB, etc. 
+// Equivalent to PINA, PINB, etc. so PINA is the same as GPPIN(GPA0)
 #define GPPIN(port) (*(volatile uint8_t *)((port) >> 3))
 
-// Equivalent to DDRA, DDRB, etc.  
+// Equivalent to DDRA, DDRB, etc. so DDRB is the same as GPDDR(GPB7) 
 #define GPDDR(port) (*(volatile uint8_t *)(((port) >> 3)+1))
 
-// Equivalent to PORTA, PORTB, etc. 
+// Equivalent to PORTA, PORTB, etc. so PORTC is the same as GPPORT(GPC3)
 #define GPPORT(port) (*(volatile uint8_t *)(((port) >> 3)+2))
 
 // The bit value of the pin part
 #define GPBV(port) (1 << ((port) & 7))
 
-// Configure the pin as output
+// Configure the pin as output DDRA |= _BV(PA0) is the same as GPOUTPUT(GPA0)
 #define GPOUTPUT(port) GPDDR(port) |= GPBV(port)
 
-// Configure the pin as input
+// Configure the pin as input DDRA &=~ _BV(PA0) is the same as GPINPUT(GPA0)
 #define GPINPUT(port)  GPDDR(port) &=~ GPBV(port)
 
-// Set the output bit
+// Set the output bit PORTA |= _BV(PA0) is the same as GPSET(GPA0)
 #define GPSET(port) GPPORT(port) |= GPBV(port)
 
-// Clear the output bit
+// Clear the output bit PORTA &=~ _BV(PA0) is the same as GPCLEAR(GPA0)
 #define GPCLEAR(port) GPPORT(port) &=~ GPBV(port)
 
-// Write a bit to either 
+// Write a bit to either 1 or 0
 #define GPWRITE(port, on) if (on) {GPSET(port);} else {GPCLEAR(port);}
 
-// Read an input pin
+// Read an input pin PINA & _BV(PA1) is the same as GPREAD(GPA1)
 #define GPREAD(port)  (GPPIN(port) & GPBV(port))
 
 

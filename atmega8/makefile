@@ -40,9 +40,6 @@ CFLAGS += -funsigned-bitfields
 CFLAGS += -fpack-struct
 CFLAGS += -fshort-enums 
 
-CFLAGS += -finline-limit=3
-CFLAGS += -fno-inline-small-functions 
-
 
 
 # Configuration macros:
@@ -61,10 +58,10 @@ LDFLAGS += -Wl,--relax
 #LDFLAGS += -L/usr/lib/avr/lib
 #LDFLAGS += -lm
 
-program : $(PROJ)-o.hex
+program : bin
 	avrdude $(AVR_PROGRAMMER) -p $(AVR) -B 1 -e -U flash:w:$(PROJ)-o.hex
 
-bin : $(PROJ).hex
+bin : $(PROJ)-o.hex
 
 # Notice: We must include this particular libm if if we want to use float at all: /usr/lib/avr/lib/libm.a 
 

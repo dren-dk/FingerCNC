@@ -52,7 +52,7 @@ void startEditingDigit() {
   min = displayToValue(cp, cp->min);
   max = displayToValue(cp, cp->max);
   
-  P("Weight of %d = %ld\n", editDigit, digitWeight);
+//  P("Weight of %d = %ld\n", editDigit, digitWeight);
 }
 
 void handleEditing(Event event) {
@@ -73,7 +73,7 @@ void handleEditing(Event event) {
 	v = min;
       }
 
-      P("delta=%d\n", delta); 
+  //    P("delta=%d\n", delta); 
       
       cp->value = v;
       setEncoderPosition(0);

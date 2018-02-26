@@ -7,6 +7,7 @@
  * only requires changing this file
  */
 #define BOARD_RAMPS
+//#define ANDERS
 
 #ifdef BOARD_RAMPS
 /*

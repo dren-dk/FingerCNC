@@ -229,3 +229,15 @@ This speed must be found by experimentation, find the speed that causes problems
 Accelerating from min speed to speed or vice versa is done by a fixed rate of acceleration.
 
 This value must be found by experimentation, find the value that causes problems and divide by at least 2
+
+
+= TODO
+
+* When disarming: 
+  * Reset to slot 0
+  * Toggle board A/B
+* RGB LED status signal:
+  * Yellow: Not armed
+  * Green: Ready to cut
+  * Red: Moving (armed or not)
+* Move while changing Home offset/Changing slot/finger size to indicate position physically

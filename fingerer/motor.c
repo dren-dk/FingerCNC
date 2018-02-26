@@ -108,7 +108,7 @@ void stopMove() {
 }
 
 void enableXMotor(uint8_t enabled) {
-  GPWRITE(MOTOR_X_ENABLE, enabled);
+  GPWRITE(MOTOR_X_ENABLE, !enabled);
   if (!enabled) {
     homed=0;
   }

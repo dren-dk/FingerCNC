@@ -42,7 +42,7 @@ void drawOption(uint8_t index, uint8_t y) {
   }
   
   u8g2_DrawStr(&u8g2, 2, y+LINE_HEIGHT-3, tmp);
-  P("draw: %d %s\n", index, tmp);
+ // P("draw: %d %s\n", index, tmp);
 }
 
 void uiUpdateSetup(Event event) {
@@ -83,5 +83,5 @@ void uiUpdateSetup(Event event) {
   }  
 
   u8g2_SendBuffer(&u8g2);  
-  L("Sent buffer\n");
+//  L("Sent buffer\n");
 }

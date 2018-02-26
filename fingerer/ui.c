@@ -73,6 +73,7 @@ void uiHandleEvents() {
       return; // No event ready, so we'll just return and let someone else have a go
     }
     
+    /*
     if (event == EVENT_ENC_A) {
       printf_P(PSTR("Encoder: %d\n"), getEncoderPosition());
     } else {
@@ -86,7 +87,7 @@ void uiHandleEvents() {
       printf_P(getEventName(event & ~EVENT_ACTIVE));
       printf_P(PSTR("\n"));
     }
-
+*/
     uiUpdate(event);    
   }
   
