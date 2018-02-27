@@ -44,7 +44,7 @@ int32_t digitWeight;
 void startEditingDigit() {
   setEncoderPosition(0);
   // Pre-calculate the important metadata:
-  digitWeight = displayToValue(cp, pow10(editDigit));
+  digitWeight = displayToValue(cp, pow10int(editDigit));
   if (!digitWeight) {
     digitWeight = 1;
   }

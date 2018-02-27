@@ -60,7 +60,7 @@ ConfigParam* getConfigParam(ConfigId configId);
 
 uint32_t displayToValue(ConfigParam* cp, uint32_t dv);
 uint32_t valueToDisplay(ConfigParam* cp, uint32_t v);
-uint32_t pow10(uint8_t power);
+uint32_t pow10int(uint8_t power);
 void storeConfig(ConfigParam *cp);
 
 void cpValueToTrimmed(ConfigParam *cp, char *target);

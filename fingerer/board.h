@@ -57,7 +57,6 @@ Connections for the RAMPS based prototype
 #define DEBUG_1        GPE3
 #define DEBUG_2        GPH3
 
-
 #elif BOARD_PROMICRO
 
 #else

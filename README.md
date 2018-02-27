@@ -206,7 +206,7 @@ Simply selects the space that's currently being cut, see the feature numbering s
 Desired advance of the x axis between cuts in percent of the blade width, so a 3mm blade
 and 50% will give a desired advance of 1.5mm.
 
-The actual advance is calculated so it ends up fitting withe notch width, so a 5mm notch gives,
+The actual advance is calculated so it ends up fitting with the notch width, so a 5mm notch gives,
 5 mm / 1.5mm = 3.33 cuts, which is impossible, so we round up to 4 cuts, which gives
 5 mm / 4 cuts = 1.25 mm/cut advance.
 
@@ -233,9 +233,6 @@ This value must be found by experimentation, find the value that causes problems
 
 = TODO
 
-* When disarming: 
-  * Reset to slot 0
-  * Toggle board A/B
 * RGB LED status signal:
   * Yellow: Not armed
   * Green: Ready to cut

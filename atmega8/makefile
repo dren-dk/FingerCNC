@@ -26,7 +26,7 @@ SIZE=avr-size
 
 DISABLE_WARNINGS = -Wno-unused-function -Wno-overlength-strings
 
-CFLAGS  = -Wall $(DISABLE_WARNINGS) -pedantic-errors -Werror -mcall-prologues -mmcu=$(AVR) -std=c99 -g
+CFLAGS  = -Wall $(DISABLE_WARNINGS) -pedantic-errors -Werror -mcall-prologues -mmcu=$(AVR) -std=gnu11 -g
 CFLAGS  += -I$(FW)
 
 

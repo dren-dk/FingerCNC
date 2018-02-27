@@ -22,10 +22,10 @@ void initFingerJoints(FingerJoints *fj,
     fj->cutsPerSlot++;
   }
 
+  fj->cutsPerSlot++;
+  
   // This is the actual distance to move for each cut after the first one
   fj->advancePerCut = widthPastFirstKerf / fj->cutsPerSlot;      
-  
-  fj->cutsPerSlot++; // The first cut counts too
   
   startSpace(fj, fj->space);
 }

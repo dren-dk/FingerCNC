@@ -19,7 +19,7 @@ ConfigParam* getConfigParam(ConfigId configId) {
   return config + configId;
 }
 
-uint32_t pow10(uint8_t power) {
+uint32_t pow10int(uint8_t power) {
   uint32_t r = 1;
   for (uint8_t i=0;i<power;i++) {
     r *= 10;
@@ -100,7 +100,7 @@ uint32_t displayToValue(ConfigParam* cp, uint32_t dv) {
   }
 
   if (cp->decimals) {
-    dv /= pow10(cp->decimals);
+    dv /= pow10int(cp->decimals);
   }
 
   return dv;
@@ -110,7 +110,7 @@ uint32_t displayToValue(ConfigParam* cp, uint32_t dv) {
 
 uint32_t valueToDisplay(ConfigParam* cp, uint32_t v) {
   if (cp->decimals) {
-    v *= pow10(cp->decimals);
+    v *= pow10int(cp->decimals);
   }
   
   if (cp->divisor) {

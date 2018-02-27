@@ -10,6 +10,7 @@
 #include "debug.h"
 #include "config.h"
 #include "fingerjoints.h"
+#include "led.h"
 
 void testFingers() {
   FingerJoints fj;
@@ -53,6 +54,9 @@ int main(void) {
   L("Ready\n");
   
   while (1) {
+    setDebug0(1);
+    ledIdle();
+    setDebug0(0);
     uiHandleEvents();
   }
 }
