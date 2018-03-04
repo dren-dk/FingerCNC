@@ -233,8 +233,4 @@ This value must be found by experimentation, find the value that causes problems
 
 = TODO
 
-* RGB LED status signal:
-  * Yellow: Not armed
-  * Green: Ready to cut
-  * Red: Moving (armed or not)
 * Move while changing Home offset/Changing slot/finger size to indicate position physically
