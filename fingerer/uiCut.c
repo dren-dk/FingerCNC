@@ -12,6 +12,7 @@
 #include "uiSetup.h"
 #include "motor.h"
 #include "fingerjoints.h"
+#include "led.h"    
 
 uint8_t armed = 0;
 int8_t cutOpt = 0;
@@ -33,8 +34,10 @@ void initFingerJointsFromConfig() {
 
 void uiCut(Event event) {
   static uint8_t moveArmed = 0;
+  static uint8_t runningError = 0;
 
   if (event == (EVENT_ACTIVE|EVENT_ENC_BTN)) {
+    ledIdle();
     armed = 0;
     initFingerJointsForBoard(fj.board ? 0 : 1);
     motorToAsap(fj.currentPos);
@@ -42,12 +45,30 @@ void uiCut(Event event) {
   
   if (moveArmed && yHome && !motorMoving()) {
     fingerAvance(&fj);
+    ledRunning();
     motorToAsap(fj.currentPos);
     moveArmed = 0;
   }
+  
+  if (!motorMoving()) {
+    ledReadyToCut();
+  }  
 
   if (!yHome) {
     moveArmed = 1;
+    if (motorMoving()) {
+      if (!runningError) {
+        ledRunningError();     
+        runningError = 1;
+      }
+    }
+  } else {
+    if (motorMoving()) {
+      if (runningError) {
+        ledReadyToCut();
+        runningError = 0;
+      } 
+    }    
   }
     
 }

@@ -246,7 +246,7 @@ int32_t estimateAccelerationDistance(int32_t initialrate,
 
   int32_t time = (targetrate-initialrate)/accelerationPerTick;
   // Acceleration is in steps / ms² -> time is in ms
-   P("ead: ir=%ld tr=%ld a=%ld t=%ld\n", initialrate, targetrate, acceleration, time);
+  //P("ead: ir=%ld tr=%ld a=%ld t=%ld\n", initialrate, targetrate, acceleration, time);
   return (initialrate*time)/1000 + acceleration*(time*time)/2000;
 }
 
