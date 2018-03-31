@@ -158,8 +158,8 @@ void initConfig() {
   // ID              Name                  Unit              divisor   d  def    min   max
   ic(C_STEPS_PER_MM, PSTR("Gearing"),      PSTR("steps/mm"), 1,        0, 200,   25,   8000);
   ic(C_BLADE_WIDTH,  PSTR("Kerf"),         MM,               STEPS_MM, 3, 2000,  1000, 6000);
-  ic(C_FINGER_WIDTH, PSTR("Finger Width"), MM,               STEPS_MM, 3, 1000,  1000, 50000);
-  ic(C_HOME_OFFSET,  PSTR("Home Offset"),  MM,               STEPS_MM, 3, 0,     0,    60000); 
+  ic(C_FINGER_WIDTH, PSTR("Finger Width"), MM,               STEPS_MM, 3, 1000,  1000, 150000);
+  ic(C_HOME_OFFSET,  PSTR("Home Offset"),  MM,               STEPS_MM, 3, 0,     0,    200000); 
   ic(C_BOARD,        PSTR("Board"),        PSTR("A/B"),      1,        0, 0,     0,    1); 
   ic(C_SPACE,        PSTR("Space"),        PSTR("n"),        1,        0, 0,     0,    100);
   ic(C_STRIDE,       PSTR("Stride"),       PSTR("%"),        1,        0, 50,    5,    95);

@@ -18,14 +18,18 @@ void initFingerJoints(FingerJoints *fj,
   fj->advancePerCut = (fj->kerf * fj->stridePct) / 100;
   uint32_t widthPastFirstKerf = fj->fingerWidth - fj->kerf;
   fj->cutsPerSlot = widthPastFirstKerf / fj->advancePerCut;
+  
+  // Round up the number of cuts past the first kerf, unless the ideal exactly matches.
   if (fj->cutsPerSlot*fj->advancePerCut < widthPastFirstKerf) {
     fj->cutsPerSlot++;
   }
 
-  fj->cutsPerSlot++;
-  
-  // This is the actual distance to move for each cut after the first one
-  fj->advancePerCut = widthPastFirstKerf / fj->cutsPerSlot;      
+  if (fj->cutsPerSlot) {
+    // This is the actual distance to move for each cut after the first one, if any
+    fj->advancePerCut = widthPastFirstKerf / fj->cutsPerSlot;      
+  }
+
+  fj->cutsPerSlot++; // We always need to make cut 0
   
   startSpace(fj, fj->space);
 }
